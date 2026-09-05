@@ -1,24 +1,66 @@
 package com.vanshika.oibsip.reservation.util;
 
+import java.io.InputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 public class DBConnection {
-    private final static String URL = "jdbc:mysql://127.0.0.1:3306/online_reservation_system";
-    private final static String USER = "root";
-    private final static String PASSWORD = "1234";
 
-    public static Connection getConnection(){
-        
-        try{
-            return DriverManager.getConnection(URL, USER, PASSWORD);
+    private static String url;
+    private static String username;
+    private static String password;
 
-        }catch (SQLException e){
+    static {
+        try {
+            // First try environment variables
+            url = System.getenv("DB_URL");
+            username = System.getenv("DB_USERNAME");
+            password = System.getenv("DB_PASSWORD");
 
-            System.out.println("Database Connection failed!!! ");
-            e.printStackTrace();
-            return null;
+            // If environment variables don't exist,
+            // load local db.properties
+            if (url == null || username == null || password == null) {
+
+                Properties properties = new Properties();
+
+                try (InputStream input =
+                             DBConnection.class
+                                     .getClassLoader()
+                                     .getResourceAsStream("db.properties")) {
+
+                    if (input != null) {
+                        properties.load(input);
+
+                        url = properties.getProperty("db.url");
+                        username = properties.getProperty("db.username");
+                        password = properties.getProperty("db.password");
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "Unable to load database configuration.", e
+            );
         }
     }
+
+    public static Connection getConnection() throws SQLException {
+
+        if (url == null || username == null || password == null) {
+            throw new SQLException(
+                    "Database configuration is missing."
+            );
+        }
+
+        return DriverManager.getConnection(
+                url,
+                username,
+                password
+        );
+    }
+
 }
