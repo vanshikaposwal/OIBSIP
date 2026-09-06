@@ -1,6 +1,9 @@
 package com.vanshika.oibsip.reservation;
 
+import com.vanshika.oibsip.reservation.ui.LoginFrame;
 import com.vanshika.oibsip.reservation.util.DBConnection;
+
+import javax.swing.*;
 
 import static com.vanshika.oibsip.reservation.util.PNRGenerator.getPNR;
 
@@ -10,15 +13,11 @@ public class Main {
 
     public static void main(String[] args) {
 
-        try (Connection connection = DBConnection.getConnection()) {
+        SwingUtilities.invokeLater(() -> {
+            LoginFrame loginFrame = new LoginFrame();
+            loginFrame.setVisible(true);
+        });
 
-            System.out.println("Database Connected Successfully!");
 
-        } catch (Exception e) {
-
-            System.out.println("Database Connection Failed!");
-            e.printStackTrace();
-
-        }
     }
 }
