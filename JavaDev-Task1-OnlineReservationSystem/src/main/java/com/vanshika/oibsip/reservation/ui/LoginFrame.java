@@ -79,16 +79,12 @@ public class LoginFrame extends JFrame {
         JButton clearButton = new JButton("Clear");
         clearButton.setBounds(290, 230, 90, 35);
 
-
-
-
         panel.add(emailLabel);
         panel.add(emailField);
         panel.add(passwordLabel);
         panel.add(passwordField);
         panel.add(loginButton);
         panel.add(clearButton);
-
 
         // Login
         loginButton.addActionListener(e -> {
@@ -120,7 +116,8 @@ public class LoginFrame extends JFrame {
                             "Login Successful!"
                     );
 
-                    // Later: Open reservation dashboard
+                    new DashboardFrame().setVisible(true);
+                    dispose();
 
                 } else {
 
@@ -140,10 +137,9 @@ public class LoginFrame extends JFrame {
         });
 
         // clear
-        clearButton.addActionListener(e ->{
+        clearButton.addActionListener(e -> {
             emailField.setText("");
             passwordField.setText("");
-
         });
 
         // Go to Sign Up
@@ -153,7 +149,6 @@ public class LoginFrame extends JFrame {
 
         return panel;
     }
-
 
     // ================= SIGN UP PANEL =================
 
@@ -172,7 +167,6 @@ public class LoginFrame extends JFrame {
         JLabel title = new JLabel("CREATE ACCOUNT");
         title.setFont(new Font("Arial", Font.BOLD, 22));
         title.setBounds(150, 60, 350, 30);
-
 
         JLabel usernameLabel = new JLabel("Username:");
         usernameLabel.setBounds(70, 105, 130, 30);
@@ -201,7 +195,10 @@ public class LoginFrame extends JFrame {
         confirmPasswordField.setBounds(210, 255, 200, 30);
 
         JButton signupButton = new JButton("Sign Up");
-        signupButton.setBounds(195, 320, 100, 35);
+        signupButton.setBounds(125, 320, 110, 35);
+
+        JButton backToLoginButton = new JButton("Back to Login");
+        backToLoginButton.setBounds(245, 320, 140, 35);
 
         panel.add(signupB);
         panel.add(title);
@@ -219,7 +216,12 @@ public class LoginFrame extends JFrame {
         panel.add(confirmPasswordField);
 
         panel.add(signupButton);
+        panel.add(backToLoginButton);
         panel.add(loginButton);
+
+        backToLoginButton.addActionListener(e -> {
+            cardLayout.show(cardPanel, "LOGIN");
+        });
 
         // Sign Up
         signupButton.addActionListener(e -> {
@@ -253,6 +255,22 @@ public class LoginFrame extends JFrame {
                         "Passwords do not match!"
                 );
 
+                return;
+            }
+
+            if (password.length() < 6) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Password must be at least 6 characters long!"
+                );
+                return;
+            }
+
+            if (!email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Please enter a valid email address (e.g. user@example.com)!"
+                );
                 return;
             }
 
@@ -304,7 +322,6 @@ public class LoginFrame extends JFrame {
 
         return panel;
     }
-
 
     // ================= MAIN =================
 

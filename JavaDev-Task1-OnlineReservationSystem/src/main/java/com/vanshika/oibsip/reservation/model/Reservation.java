@@ -6,28 +6,17 @@ import java.time.LocalDateTime;
 public class Reservation {
 
     private int reservationId;
-
     private String pnrNumber;
-
     private String passengerName;
-
     private int trainNumber;
-
     private String classType;
-
     private LocalDate journeyDate;
-
     private String sourceStation;
-
     private String destinationStation;
-
     private LocalDateTime bookingDate;
 
-
     // Constructors
-
-    public Reservation(){
-
+    public Reservation() {
     }
 
     public Reservation(String classType, LocalDateTime bookingDate, String destinationStation, LocalDate journeyDate,
@@ -44,10 +33,19 @@ public class Reservation {
         this.trainNumber = trainNumber;
     }
 
+    public Reservation(String pnrNumber, String passengerName, int trainNumber,
+                       String classType, LocalDate journeyDate,
+                       String sourceStation, String destinationStation) {
+        this.pnrNumber = pnrNumber;
+        this.passengerName = passengerName;
+        this.trainNumber = trainNumber;
+        this.classType = classType;
+        this.journeyDate = journeyDate;
+        this.sourceStation = sourceStation;
+        this.destinationStation = destinationStation;
+    }
 
-    //Getters and Setters
-
-
+    // Getters and Setters
     public LocalDateTime getBookingDate() {
         return bookingDate;
     }
@@ -119,6 +117,4 @@ public class Reservation {
     public void setTrainNumber(int trainNumber) {
         this.trainNumber = trainNumber;
     }
-
-
 }

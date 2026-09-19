@@ -17,6 +17,13 @@ public class DBConnection {
 
         try {
 
+            // Register MySQL JDBC Driver
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+            } catch (ClassNotFoundException e) {
+                System.err.println("MySQL JDBC Driver not found on classpath: " + e.getMessage());
+            }
+
             // Try environment variables first
             url = System.getenv("DB_URL");
             username = System.getenv("DB_USERNAME");
