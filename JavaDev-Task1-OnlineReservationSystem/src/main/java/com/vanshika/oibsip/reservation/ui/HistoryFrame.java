@@ -249,7 +249,7 @@ public class HistoryFrame extends JFrame {
         button.setFont(new Font("Arial", Font.BOLD, 13));
         button.setFocusPainted(false);
         button.setBackground(bgColor);
-        button.setForeground(Color.WHITE);
+        button.setForeground(Color.BLACK);
         button.setBorder(BorderFactory.createEmptyBorder(8, 14, 8, 14));
     }
 

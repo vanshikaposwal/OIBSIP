@@ -161,7 +161,7 @@ public class ReservationFrame extends JFrame {
         JButton backToDashboardButton = new JButton("Back to Dashboard");
         backToDashboardButton.setBounds(450, 360, 175, 40);
 
-        styleButton(bookButton, new Color(129, 154, 190));
+        styleButton(bookButton, new Color(31, 116, 238));
         bookButton.setForeground(Color.BLACK);
         styleButton(backToSearchButton, new Color(129, 154, 190));
         backToSearchButton.setForeground(Color.BLACK);

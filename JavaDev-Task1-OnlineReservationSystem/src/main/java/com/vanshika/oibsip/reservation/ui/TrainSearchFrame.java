@@ -145,7 +145,7 @@ public class TrainSearchFrame extends JFrame {
 //        styleButton(searchButton);
         searchButton.setFont(new Font("Arial", Font.BOLD, 14));
         searchButton.setForeground(Color.BLACK);
-        searchButton.setBackground(new Color(100, 116, 139));
+        searchButton.setBackground(new Color(31, 116, 238));
 
         gbc.gridx = 6;
         searchPanel.add(searchButton, gbc);

@@ -141,7 +141,7 @@ public class CancellationFrame extends JFrame {
         cancelButton = new JButton("Confirm Cancellation");
         cancelButton.setBounds(130, 345, 180, 38);
         cancelButton.setEnabled(false);
-        styleButton(cancelButton, new Color(220, 38, 38));
+        styleButton(cancelButton, new Color(218, 36, 36));
 
         backButton = new JButton("Back to Dashboard");
         backButton.setBounds(330, 345, 170, 38);
@@ -290,7 +290,7 @@ public class CancellationFrame extends JFrame {
         button.setFont(new Font("Arial", Font.BOLD, 13));
         button.setFocusPainted(false);
         button.setBackground(bgColor);
-        button.setForeground(Color.WHITE);
+        button.setForeground(Color.BLACK);
     }
 
     public static void main(String[] args) {
@@ -299,4 +299,7 @@ public class CancellationFrame extends JFrame {
             frame.setVisible(true);
         });
     }
+
+
+//    =================================== Main =================================
 }
