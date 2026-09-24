@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: digital-library-management
+
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/library_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Asia/Kolkata&allowPublicKeyRetrieval=true}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  security:
+    user:
+      # Overridden by custom UserDetailsService — these are just defaults Spring ignores
+      name: ignored
+      password: ignored
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        http-only: true
+        same-site: lax
+
+library:
+  loan-days: 14
+  fine-per-day: 5
+  max-active-issues: 5
+  block-on-unpaid-fines: true
+
+logging:
+  level:
+    com.library.management: INFO
+    org.springframework.security: WARN
+    org.flywaydb: INFO

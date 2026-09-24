@@ -1,0 +1,24 @@
+package com.library.management.dto;
+
+import com.library.management.entity.User;
+
+import java.time.LocalDateTime;
+
+public record UserResponse(
+        Long id,
+        String name,
+        String email,
+        String role,
+        String phone,
+        String address,
+        boolean enabled,
+        LocalDateTime createdAt
+) {
+    public static UserResponse from(User u) {
+        return new UserResponse(
+                u.getId(), u.getName(), u.getEmail(),
+                u.getRole().name(), u.getPhone(), u.getAddress(),
+                u.isEnabled(), u.getCreatedAt()
+        );
+    }
+}

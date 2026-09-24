@@ -1,0 +1,31 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=VALUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+  flyway:
+    enabled: false
+
+library:
+  loan-days: 14
+  fine-per-day: 5
+  max-active-issues: 5
+  block-on-unpaid-fines: true
+
+logging:
+  level:
+    com.library.management: DEBUG
+    org.springframework.security: DEBUG
