@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Help &amp; Queries — LibSphere</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+          <i class="bi bi-book-half"></i>
+          <span>LibSphere</span>
+        </a>
+        <button class="sidebar-close-btn" id="sidebar-close-btn">&times;</button>
+      </div>
+
+      <div class="sidebar-body">
+        <div class="nav-section-title">Navigation</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/dashboard.html" class="nav-link" id="nav-dashboard">
+              <i class="bi bi-speedometer2"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="/browse.html" class="nav-link" id="nav-browse">
+              <i class="bi bi-grid-3x3-gap-fill"></i>
+              <span>Browse Catalog</span>
+            </a>
+          </li>
+        </ul>
+
+        <div id="user-nav-section">
+          <div class="nav-section-title">My Account</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/my-books.html" class="nav-link" id="nav-my-books">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>My Borrowed Books</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-reservations.html" class="nav-link" id="nav-my-reservations">
+                <i class="bi bi-bookmark-check"></i>
+                <span>My Reservations</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-fines.html" class="nav-link" id="nav-my-fines">
+                <i class="bi bi-cash-stack"></i>
+                <span>My Fines</span>
+              </a>
+            </li>
+            <li>
+              <a href="/contact.html" class="nav-link" id="nav-contact">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>Help & Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="admin-nav-section" style="display: none;">
+          <div class="nav-section-title">Administration</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/admin-books.html" class="nav-link" id="nav-admin-books">
+                <i class="bi bi-book"></i>
+                <span>Manage Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-issues.html" class="nav-link" id="nav-admin-issues">
+                <i class="bi bi-arrow-left-right"></i>
+                <span>Issues & Returns</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-users.html" class="nav-link" id="nav-admin-users">
+                <i class="bi bi-people-fill"></i>
+                <span>Users & Roles</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-fines.html" class="nav-link" id="nav-admin-fines">
+                <i class="bi bi-currency-rupee"></i>
+                <span>Fines Ledger</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-queries.html" class="nav-link" id="nav-admin-queries">
+                <i class="bi bi-inbox-fill"></i>
+                <span>Member Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sidebar-footer" id="sidebar-user-section"></div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <i class="bi bi-list"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>Help &amp; Support</h1>
+            <p>Submit inquiries, book requests, or contact the librarian</p>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-content">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.75rem; align-items: start;" id="contact-grid">
+
+          <!-- Submit Query Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Send a Query / Request</h3>
+                <p class="card-subtitle">Our library team typically responds within 24 hours</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <form id="contact-form">
+                <div class="form-group">
+                  <label for="contact-name" class="form-label">Your Name *</label>
+                  <input type="text" id="contact-name" class="form-control" required placeholder="Full Name">
+                </div>
+
+                <div class="form-group">
+                  <label for="contact-email" class="form-label">Email Address *</label>
+                  <input type="email" id="contact-email" class="form-control" required placeholder="name@example.com">
+                </div>
+
+                <div class="form-group">
+                  <label for="contact-subject" class="form-label">Subject *</label>
+                  <input type="text" id="contact-subject" class="form-control" required placeholder="e.g. Book Acquisition Request: Machine Learning">
+                </div>
+
+                <div class="form-group">
+                  <label for="contact-message" class="form-label">Message / Details *</label>
+                  <textarea id="contact-message" class="form-control" rows="4" required placeholder="Describe your question, request, or issue..."></textarea>
+                </div>
+
+                <button type="submit" id="contact-submit-btn" class="btn btn-primary" style="width: 100%;">
+                  <i class="bi bi-send-fill"></i> Submit Query
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- My Queries or FAQ -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title" id="history-header">My Submitted Queries</h3>
+            </div>
+            <div class="card-body" style="padding: 1rem;">
+              <div id="queries-history-container">
+                <p style="color: var(--color-text-muted); font-size: 0.85rem;">Sign in to see past support inquiries and responses.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let user = null;
+
+    async function init() {
+      await initLayout('contact');
+      user = await getCurrentUser();
+
+      if (user) {
+        document.getElementById('contact-name').value = user.name;
+        document.getElementById('contact-email').value = user.email;
+        loadMyQueries();
+      } else {
+        document.getElementById('queries-history-container').innerHTML = `
+          <div class="empty-state" style="padding: 1.5rem;">
+            <i class="bi bi-person-lock empty-state-icon" style="font-size: 2.25rem;"></i>
+            <h4 class="empty-state-title" style="font-size: 1rem;">Guest Submission</h4>
+            <p class="empty-state-text" style="font-size: 0.825rem;">
+              You can submit queries anonymously as a guest. To track query resolution history, please sign in.
+            </p>
+            <a href="/login.html" class="btn btn-secondary btn-sm">Sign In</a>
+          </div>
+        `;
+      }
+    }
+
+    async function loadMyQueries() {
+      const box = document.getElementById('queries-history-container');
+      try {
+        const pageData = await apiFetch('/api/queries/my?size=10');
+        const items = pageData.content || [];
+
+        if (items.length === 0) {
+          box.innerHTML = renderEmptyState('No past queries', 'You haven\'t submitted any support requests yet.', 'bi-inbox');
+          return;
+        }
+
+        box.innerHTML = items.map(q => `
+          <div style="border-bottom: 1px solid var(--color-border-light); padding: 0.85rem 0.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem;">
+              <strong style="color: var(--color-primary); font-size: 0.9rem;">${escapeHtml(q.subject)}</strong>
+              ${renderBadge(q.status)}
+            </div>
+            <p style="font-size: 0.825rem; color: var(--color-text-muted); margin-bottom: 0.35rem; line-height: 1.4;">
+              ${escapeHtml(q.message)}
+            </p>
+            <div style="font-size: 0.75rem; color: var(--color-text-light);">
+              Submitted on ${q.createdAt ? q.createdAt.replace('T', ' ').substring(0, 16) : ''}
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        box.innerHTML = `<div style="color: var(--color-danger); font-size: 0.85rem;">Failed to load queries.</div>`;
+      }
+    }
+
+    document.getElementById('contact-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('contact-submit-btn');
+      const name = document.getElementById('contact-name').value.trim();
+      const email = document.getElementById('contact-email').value.trim();
+      const subject = document.getElementById('contact-subject').value.trim();
+      const message = document.getElementById('contact-message').value.trim();
+
+      setButtonLoading(btn, true);
+
+      try {
+        await apiFetch('/api/queries', {
+          method: 'POST',
+          body: JSON.stringify({ name, email, subject, message })
+        });
+
+        showToast('Query submitted successfully! We will get in touch.', 'success');
+        document.getElementById('contact-subject').value = '';
+        document.getElementById('contact-message').value = '';
+        if (user) loadMyQueries();
+      } catch (err) {
+        showToast('Failed to submit query: ' + err.message, 'danger');
+      } finally {
+        setButtonLoading(btn, false, '<i class="bi bi-send-fill"></i> Submit Query');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

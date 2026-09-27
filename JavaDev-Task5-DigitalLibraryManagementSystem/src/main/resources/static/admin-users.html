@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Users — Admin | LibSphere</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+          <i class="bi bi-book-half"></i>
+          <span>LibSphere</span>
+        </a>
+        <button class="sidebar-close-btn" id="sidebar-close-btn">&times;</button>
+      </div>
+
+      <div class="sidebar-body">
+        <div class="nav-section-title">Navigation</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/dashboard.html" class="nav-link" id="nav-dashboard">
+              <i class="bi bi-speedometer2"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="/browse.html" class="nav-link" id="nav-browse">
+              <i class="bi bi-grid-3x3-gap-fill"></i>
+              <span>Browse Catalog</span>
+            </a>
+          </li>
+        </ul>
+
+        <div id="user-nav-section">
+          <div class="nav-section-title">My Account</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/my-books.html" class="nav-link" id="nav-my-books">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>My Borrowed Books</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-reservations.html" class="nav-link" id="nav-my-reservations">
+                <i class="bi bi-bookmark-check"></i>
+                <span>My Reservations</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-fines.html" class="nav-link" id="nav-my-fines">
+                <i class="bi bi-cash-stack"></i>
+                <span>My Fines</span>
+              </a>
+            </li>
+            <li>
+              <a href="/contact.html" class="nav-link" id="nav-contact">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>Help & Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="admin-nav-section">
+          <div class="nav-section-title">Administration</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/admin-books.html" class="nav-link" id="nav-admin-books">
+                <i class="bi bi-book"></i>
+                <span>Manage Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-issues.html" class="nav-link" id="nav-admin-issues">
+                <i class="bi bi-arrow-left-right"></i>
+                <span>Issues & Returns</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-users.html" class="nav-link" id="nav-admin-users">
+                <i class="bi bi-people-fill"></i>
+                <span>Users & Roles</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-fines.html" class="nav-link" id="nav-admin-fines">
+                <i class="bi bi-currency-rupee"></i>
+                <span>Fines Ledger</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-queries.html" class="nav-link" id="nav-admin-queries">
+                <i class="bi bi-inbox-fill"></i>
+                <span>Member Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sidebar-footer" id="sidebar-user-section"></div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <i class="bi bi-list"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>User Accounts &amp; Permissions</h1>
+            <p>Manage patron profiles, administrative privileges, and account status</p>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-content">
+
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Contact Email</th>
+                  <th>Phone</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Registered</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <!-- Populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="pagination-container"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal-backdrop" id="user-edit-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit User Account</h3>
+        <button type="button" class="modal-close" onclick="closeUserEditModal()">&times;</button>
+      </div>
+      <form id="user-edit-form">
+        <div class="modal-body">
+          <input type="hidden" id="ue-id">
+
+          <div class="form-group">
+            <label class="form-label" for="ue-name">Full Name *</label>
+            <input type="text" id="ue-name" class="form-control" required minlength="2" maxlength="120">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ue-email">Email Address *</label>
+            <input type="email" id="ue-email" class="form-control" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="ue-role">System Role *</label>
+              <select id="ue-role" class="form-select" required>
+                <option value="ROLE_USER">ROLE_USER (Member)</option>
+                <option value="ROLE_ADMIN">ROLE_ADMIN (Administrator)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ue-status">Account Status *</label>
+              <select id="ue-status" class="form-select" required>
+                <option value="true">Active / Enabled</option>
+                <option value="false">Suspended / Disabled</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ue-phone">Phone</label>
+            <input type="tel" id="ue-phone" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="ue-address">Address</label>
+            <textarea id="ue-address" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeUserEditModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="ue-submit-btn">Update User</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let currentPage = 0;
+    let usersList = [];
+
+    async function init() {
+      const user = await requireAuth('ROLE_ADMIN');
+      if (!user) return;
+      await initLayout('admin-users');
+      loadUsers();
+    }
+
+    async function loadUsers(page = 0) {
+      currentPage = page;
+      const tbody = document.getElementById('users-table-body');
+      tbody.innerHTML = renderSkeletonRows(7, 5);
+
+      try {
+        const pageData = await apiFetch(`/api/admin/users?page=${page}&size=20`);
+        usersList = pageData.content || [];
+
+        if (usersList.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 3rem;">${renderEmptyState('No users found', '')}</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = usersList.map(u => `
+          <tr>
+            <td>
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div class="user-avatar" style="width: 32px; height: 32px; font-size: 0.75rem;">${getInitials(u.name)}</div>
+                <div>
+                  <strong>${escapeHtml(u.name)}</strong>
+                  <div style="font-size: 0.75rem; color: var(--color-text-light);">ID: #${u.id}</div>
+                </div>
+              </div>
+            </td>
+            <td>${escapeHtml(u.email)}</td>
+            <td>${u.phone ? escapeHtml(u.phone) : '<span style="color: var(--color-text-light);">&mdash;</span>'}</td>
+            <td>${renderBadge(u.role)}</td>
+            <td>${u.enabled ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Disabled</span>'}</td>
+            <td>${u.createdAt ? u.createdAt.substring(0, 10) : ''}</td>
+            <td>
+              <div style="display: flex; gap: 0.35rem;">
+                <button class="btn btn-secondary btn-sm" onclick="openEditUserModal(${u.id})" title="Edit User">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-secondary btn-sm" style="color: var(--color-danger);" onclick="handleDeleteUser(${u.id}, '${escapeHtml(u.name)}')" title="Delete User">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+        document.getElementById('pagination-container').innerHTML = renderPagination(pageData, 'loadUsers');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-danger); padding: 2rem;">Failed to load users: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function openEditUserModal(userId) {
+      const u = usersList.find(x => x.id === userId);
+      if (!u) return;
+
+      document.getElementById('ue-id').value = u.id;
+      document.getElementById('ue-name').value = u.name;
+      document.getElementById('ue-email').value = u.email;
+      document.getElementById('ue-role').value = u.role;
+      document.getElementById('ue-status').value = u.enabled ? 'true' : 'false';
+      document.getElementById('ue-phone').value = u.phone || '';
+      document.getElementById('ue-address').value = u.address || '';
+
+      document.getElementById('user-edit-modal').classList.add('show');
+    }
+
+    function closeUserEditModal() {
+      document.getElementById('user-edit-modal').classList.remove('show');
+    }
+
+    document.getElementById('user-edit-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('ue-id').value;
+      const btn = document.getElementById('ue-submit-btn');
+
+      const payload = {
+        name: document.getElementById('ue-name').value.trim(),
+        email: document.getElementById('ue-email').value.trim(),
+        role: document.getElementById('ue-role').value,
+        enabled: document.getElementById('ue-status').value === 'true',
+        phone: document.getElementById('ue-phone').value.trim() || null,
+        address: document.getElementById('ue-address').value.trim() || null
+      };
+
+      setButtonLoading(btn, true);
+
+      try {
+        await apiFetch(`/api/admin/users/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload)
+        });
+        showToast('User account updated successfully', 'success');
+        closeUserEditModal();
+        loadUsers(currentPage);
+      } catch (err) {
+        showToast('Failed to update user: ' + err.message, 'danger');
+      } finally {
+        setButtonLoading(btn, false, 'Update User');
+      }
+    });
+
+    async function handleDeleteUser(id, name) {
+      showConfirmModal({
+        title: 'Delete User Account',
+        message: `Are you sure you want to delete user account "${name}"? This will permanently delete the user.`,
+        confirmText: 'Delete User',
+        isDanger: true,
+        onConfirm: async () => {
+          await apiFetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+          showToast(`User "${name}" deleted successfully`, 'info');
+          loadUsers(currentPage);
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

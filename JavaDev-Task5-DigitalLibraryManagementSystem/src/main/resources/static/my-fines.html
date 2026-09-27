@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Fines & Fees — LibSphere</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+          <i class="bi bi-book-half"></i>
+          <span>LibSphere</span>
+        </a>
+        <button class="sidebar-close-btn" id="sidebar-close-btn">&times;</button>
+      </div>
+
+      <div class="sidebar-body">
+        <div class="nav-section-title">Navigation</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/dashboard.html" class="nav-link" id="nav-dashboard">
+              <i class="bi bi-speedometer2"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="/browse.html" class="nav-link" id="nav-browse">
+              <i class="bi bi-grid-3x3-gap-fill"></i>
+              <span>Browse Catalog</span>
+            </a>
+          </li>
+        </ul>
+
+        <div id="user-nav-section">
+          <div class="nav-section-title">My Account</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/my-books.html" class="nav-link" id="nav-my-books">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>My Borrowed Books</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-reservations.html" class="nav-link" id="nav-my-reservations">
+                <i class="bi bi-bookmark-check"></i>
+                <span>My Reservations</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-fines.html" class="nav-link" id="nav-my-fines">
+                <i class="bi bi-cash-stack"></i>
+                <span>My Fines</span>
+              </a>
+            </li>
+            <li>
+              <a href="/contact.html" class="nav-link" id="nav-contact">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>Help & Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="admin-nav-section" style="display: none;">
+          <div class="nav-section-title">Administration</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/admin-books.html" class="nav-link" id="nav-admin-books">
+                <i class="bi bi-book"></i>
+                <span>Manage Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-issues.html" class="nav-link" id="nav-admin-issues">
+                <i class="bi bi-arrow-left-right"></i>
+                <span>Issues & Returns</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-users.html" class="nav-link" id="nav-admin-users">
+                <i class="bi bi-people-fill"></i>
+                <span>Users & Roles</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-fines.html" class="nav-link" id="nav-admin-fines">
+                <i class="bi bi-currency-rupee"></i>
+                <span>Fines Ledger</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-queries.html" class="nav-link" id="nav-admin-queries">
+                <i class="bi bi-inbox-fill"></i>
+                <span>Member Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sidebar-footer" id="sidebar-user-section"></div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <i class="bi bi-list"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>My Fines &amp; Dues</h1>
+            <p>Overdue assessment breakdown and online payment clearance</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <span class="badge badge-warning" id="total-due-badge" style="font-size: 0.85rem; padding: 0.45rem 0.85rem;">Total Due: ₹0</span>
+        </div>
+      </header>
+
+      <main class="page-content">
+
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-body" style="padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <h3 style="font-size: 1rem; font-weight: 700; color: var(--color-primary); margin-bottom: 0.25rem;">Fine Policy Notice</h3>
+              <p style="font-size: 0.825rem; color: var(--color-text-muted);">
+                Overdue fines accrue at <strong>₹5 per day</strong> past the return due date. As per library policy, users with unpaid dues cannot borrow new books until settled.
+              </p>
+            </div>
+            <div style="font-size: 0.825rem; color: var(--color-indigo); font-weight: 600;">
+              <i class="bi bi-shield-check"></i> Instant Clearance
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Fine Ref #</th>
+                  <th>Book Title</th>
+                  <th>Overdue Amount</th>
+                  <th>Status</th>
+                  <th>Settled At</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="fines-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="pagination-container"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let currentPage = 0;
+
+    async function init() {
+      const user = await requireAuth();
+      if (!user) return;
+      await initLayout('my-fines');
+      loadFines();
+    }
+
+    async function loadFines(page = 0) {
+      currentPage = page;
+      const tbody = document.getElementById('fines-table-body');
+      tbody.innerHTML = renderSkeletonRows(6, 3);
+
+      try {
+        const pageData = await apiFetch(`/api/fines/my?page=${page}&size=15`);
+        const items = pageData.content || [];
+
+        const totalUnpaid = items.filter(f => !f.paid).reduce((s, f) => s + Number(f.amount), 0);
+        document.getElementById('total-due-badge').textContent = `Total Due: ₹${totalUnpaid.toFixed(2)}`;
+        document.getElementById('total-due-badge').className = totalUnpaid > 0 ? 'badge badge-danger' : 'badge badge-success';
+
+        if (items.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 3rem;">
+                ${renderEmptyState('No fines recorded', 'You have no overdue penalties or unpaid dues on record!', 'bi-check-circle-fill')}
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = items.map(f => `
+          <tr>
+            <td><code>FIN-${f.id.toString().padStart(4, '0')}</code></td>
+            <td><strong style="color: var(--color-primary);">${escapeHtml(f.bookTitle)}</strong></td>
+            <td><strong style="font-size: 0.95rem; color: ${f.paid ? 'var(--color-text-main)' : 'var(--color-danger)'};">₹${Number(f.amount).toFixed(2)}</strong></td>
+            <td>${renderBadge(f.paid ? 'PAID' : 'UNPAID')}</td>
+            <td>${f.paidAt ? formatDate(f.paidAt) : '<span style="color: var(--color-text-light);">&mdash;</span>'}</td>
+            <td>
+              ${!f.paid
+                ? `<button class="btn btn-success btn-sm" onclick="handlePayFine(${f.id}, ${f.amount}, '${escapeHtml(f.bookTitle)}')">
+                     <i class="bi bi-credit-card-2-front"></i> Pay ₹${Number(f.amount).toFixed(0)}
+                   </button>`
+                : `<span style="font-size: 0.8rem; color: var(--color-success); font-weight: 600;"><i class="bi bi-check-lg"></i> Settled</span>`
+              }
+            </td>
+          </tr>
+        `).join('');
+
+        document.getElementById('pagination-container').innerHTML = renderPagination(pageData, 'loadFines');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--color-danger); padding: 2rem;">Failed to load fines: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function formatDate(dt) {
+      if (!dt) return '';
+      return dt.replace('T', ' ').substring(0, 16);
+    }
+
+    async function handlePayFine(fineId, amount, bookTitle) {
+      showConfirmModal({
+        title: 'Settle Overdue Fine',
+        message: `Confirm payment of ₹${Number(amount).toFixed(2)} for "${bookTitle}"? This will immediately restore your borrowing privileges.`,
+        confirmText: 'Complete Payment',
+        onConfirm: async () => {
+          await apiFetch(`/api/fines/${fineId}/pay`, { method: 'POST' });
+          showToast(`Fine of ₹${Number(amount).toFixed(2)} settled successfully!`, 'success');
+          loadFines(currentPage);
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

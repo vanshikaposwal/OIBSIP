@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Book Inventory — Admin | LibSphere</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+          <i class="bi bi-book-half"></i>
+          <span>LibSphere</span>
+        </a>
+        <button class="sidebar-close-btn" id="sidebar-close-btn">&times;</button>
+      </div>
+
+      <div class="sidebar-body">
+        <div class="nav-section-title">Navigation</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/dashboard.html" class="nav-link" id="nav-dashboard">
+              <i class="bi bi-speedometer2"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="/browse.html" class="nav-link" id="nav-browse">
+              <i class="bi bi-grid-3x3-gap-fill"></i>
+              <span>Browse Catalog</span>
+            </a>
+          </li>
+        </ul>
+
+        <div id="user-nav-section">
+          <div class="nav-section-title">My Account</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/my-books.html" class="nav-link" id="nav-my-books">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>My Borrowed Books</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-reservations.html" class="nav-link" id="nav-my-reservations">
+                <i class="bi bi-bookmark-check"></i>
+                <span>My Reservations</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-fines.html" class="nav-link" id="nav-my-fines">
+                <i class="bi bi-cash-stack"></i>
+                <span>My Fines</span>
+              </a>
+            </li>
+            <li>
+              <a href="/contact.html" class="nav-link" id="nav-contact">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>Help & Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="admin-nav-section">
+          <div class="nav-section-title">Administration</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/admin-books.html" class="nav-link" id="nav-admin-books">
+                <i class="bi bi-book"></i>
+                <span>Manage Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-issues.html" class="nav-link" id="nav-admin-issues">
+                <i class="bi bi-arrow-left-right"></i>
+                <span>Issues & Returns</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-users.html" class="nav-link" id="nav-admin-users">
+                <i class="bi bi-people-fill"></i>
+                <span>Users & Roles</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-fines.html" class="nav-link" id="nav-admin-fines">
+                <i class="bi bi-currency-rupee"></i>
+                <span>Fines Ledger</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-queries.html" class="nav-link" id="nav-admin-queries">
+                <i class="bi bi-inbox-fill"></i>
+                <span>Member Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sidebar-footer" id="sidebar-user-section"></div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <i class="bi bi-list"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>Book Inventory Management</h1>
+            <p>Add new titles, update copy quantities, and catalog catalog details</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary btn-sm" onclick="openAddBookModal()">
+            <i class="bi bi-plus-lg"></i> Add New Book
+          </button>
+        </div>
+      </header>
+
+      <main class="page-content">
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <div class="filter-group" style="flex: 1;">
+            <div class="search-input-wrapper" style="flex: 1; max-width: 320px;">
+              <i class="bi bi-search"></i>
+              <input type="text" id="admin-search-input" class="form-control" placeholder="Filter by title, author, or ISBN...">
+            </div>
+            <select id="admin-cat-filter" class="form-select" style="max-width: 180px;">
+              <option value="">All Categories</option>
+              <option value="Java">Java</option>
+              <option value="Programming">Programming</option>
+              <option value="Database">Database</option>
+              <option value="Web Development">Web Development</option>
+              <option value="Computer Science">Computer Science</option>
+              <option value="Fiction">Fiction</option>
+              <option value="Science">Science</option>
+              <option value="History">History</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Book</th>
+                  <th>Category</th>
+                  <th>ISBN</th>
+                  <th>Total Copies</th>
+                  <th>Available</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="books-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="pagination-container"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Add/Edit Book Modal -->
+  <div class="modal-backdrop" id="book-form-modal">
+    <div class="modal-dialog" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="bfm-title">Add New Book</h3>
+        <button type="button" class="modal-close" onclick="closeBookFormModal()">&times;</button>
+      </div>
+      <form id="book-form">
+        <div class="modal-body">
+          <input type="hidden" id="bf-id">
+
+          <div class="form-group">
+            <label class="form-label" for="bf-title">Title *</label>
+            <input type="text" id="bf-title" class="form-control" required maxlength="300" placeholder="e.g. Designing Data-Intensive Applications">
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="bf-author">Author *</label>
+              <input type="text" id="bf-author" class="form-control" required maxlength="200" placeholder="e.g. Martin Kleppmann">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="bf-category">Category *</label>
+              <input type="text" id="bf-category" class="form-control" required maxlength="80" placeholder="e.g. Database">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="bf-isbn">ISBN *</label>
+              <input type="text" id="bf-isbn" class="form-control" required maxlength="20" placeholder="e.g. 978-1449373320">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="bf-year">Publish Year</label>
+              <input type="number" id="bf-year" class="form-control" min="1000" max="2100" placeholder="e.g. 2017">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="bf-publisher">Publisher</label>
+              <input type="text" id="bf-publisher" class="form-control" maxlength="200" placeholder="e.g. O'Reilly Media">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="bf-quantity">Total Copies *</label>
+              <input type="number" id="bf-quantity" class="form-control" required min="1" max="1000" value="1">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="bf-desc">Description</label>
+            <textarea id="bf-desc" class="form-control" rows="3" placeholder="Brief summary of the volume..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeBookFormModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="bf-submit-btn">Save Book</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let currentPage = 0;
+    let booksDataList = [];
+
+    async function init() {
+      const user = await requireAuth('ROLE_ADMIN');
+      if (!user) return;
+      await initLayout('admin-books');
+      loadBooks();
+    }
+
+    let searchTimer = null;
+    document.getElementById('admin-search-input').addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => { currentPage = 0; loadBooks(); }, 300);
+    });
+    document.getElementById('admin-cat-filter').addEventListener('change', () => {
+      currentPage = 0;
+      loadBooks();
+    });
+
+    async function loadBooks(page = 0) {
+      currentPage = page;
+      const tbody = document.getElementById('books-table-body');
+      tbody.innerHTML = renderSkeletonRows(6, 5);
+
+      const q = document.getElementById('admin-search-input').value.trim();
+      const cat = document.getElementById('admin-cat-filter').value;
+
+      let url = `/api/books?page=${page}&size=15&sortBy=title&dir=asc`;
+      if (q) url += `&query=${encodeURIComponent(q)}`;
+      if (cat) url += `&category=${encodeURIComponent(cat)}`;
+
+      try {
+        const pageData = await apiFetch(url);
+        booksDataList = pageData.content || [];
+
+        if (booksDataList.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 3rem;">${renderEmptyState('No books found', 'Click Add New Book to create your first title.')}</td></tr>`;
+          document.getElementById('pagination-container').innerHTML = '';
+          return;
+        }
+
+        tbody.innerHTML = booksDataList.map(b => `
+          <tr>
+            <td>
+              <div style="display: flex; align-items: center; gap: 0.85rem;">
+                ${generateBookCover(b.title, b.category)}
+                <div>
+                  <strong style="color: var(--color-primary); font-size: 0.95rem;">${escapeHtml(b.title)}</strong>
+                  <div style="font-size: 0.8rem; color: var(--color-text-muted);">by ${escapeHtml(b.author)} (${b.publishYear || 'N/A'})</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-neutral">${escapeHtml(b.category)}</span></td>
+            <td><code>${escapeHtml(b.isbn)}</code></td>
+            <td><strong>${b.totalQuantity}</strong></td>
+            <td>
+              ${b.availableQuantity > 0
+                ? `<span class="badge badge-success">${b.availableQuantity} in stock</span>`
+                : `<span class="badge badge-danger">0 in stock</span>`
+              }
+            </td>
+            <td>
+              <div style="display: flex; gap: 0.4rem;">
+                <button class="btn btn-secondary btn-sm" onclick="openEditBookModal(${b.id})" title="Edit">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-secondary btn-sm" style="color: var(--color-danger);" onclick="handleDeleteBook(${b.id}, '${escapeHtml(b.title)}')" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+        document.getElementById('pagination-container').innerHTML = renderPagination(pageData, 'loadBooks');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--color-danger); padding: 2rem;">Failed to load books: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function openAddBookModal() {
+      document.getElementById('bfm-title').textContent = 'Add New Book';
+      document.getElementById('bf-id').value = '';
+      document.getElementById('book-form').reset();
+      document.getElementById('book-form-modal').classList.add('show');
+    }
+
+    function openEditBookModal(bookId) {
+      const b = booksDataList.find(x => x.id === bookId);
+      if (!b) return;
+
+      document.getElementById('bfm-title').textContent = 'Edit Book Details';
+      document.getElementById('bf-id').value = b.id;
+      document.getElementById('bf-title').value = b.title;
+      document.getElementById('bf-author').value = b.author;
+      document.getElementById('bf-category').value = b.category;
+      document.getElementById('bf-isbn').value = b.isbn;
+      document.getElementById('bf-year').value = b.publishYear || '';
+      document.getElementById('bf-publisher').value = b.publisher || '';
+      document.getElementById('bf-quantity').value = b.totalQuantity;
+      document.getElementById('bf-desc').value = b.description || '';
+
+      document.getElementById('book-form-modal').classList.add('show');
+    }
+
+    function closeBookFormModal() {
+      document.getElementById('book-form-modal').classList.remove('show');
+    }
+
+    document.getElementById('book-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('bf-id').value;
+      const btn = document.getElementById('bf-submit-btn');
+
+      const payload = {
+        title: document.getElementById('bf-title').value.trim(),
+        author: document.getElementById('bf-author').value.trim(),
+        category: document.getElementById('bf-category').value.trim(),
+        isbn: document.getElementById('bf-isbn').value.trim(),
+        publishYear: document.getElementById('bf-year').value ? parseInt(document.getElementById('bf-year').value) : null,
+        publisher: document.getElementById('bf-publisher').value.trim() || null,
+        totalQuantity: parseInt(document.getElementById('bf-quantity').value),
+        description: document.getElementById('bf-desc').value.trim() || null
+      };
+
+      setButtonLoading(btn, true);
+
+      try {
+        if (id) {
+          await apiFetch(`/api/books/${id}`, {
+            method: 'PUT',
+            body: JSON.stringify(payload)
+          });
+          showToast('Book updated successfully!', 'success');
+        } else {
+          await apiFetch('/api/books', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+          showToast('New book created successfully!', 'success');
+        }
+        closeBookFormModal();
+        loadBooks(currentPage);
+      } catch (err) {
+        showToast('Error saving book: ' + err.message, 'danger');
+      } finally {
+        setButtonLoading(btn, false, 'Save Book');
+      }
+    });
+
+    async function handleDeleteBook(id, title) {
+      showConfirmModal({
+        title: 'Delete Book',
+        message: `Permanently delete "${title}"? This cannot be undone.`,
+        confirmText: 'Delete Permanently',
+        isDanger: true,
+        onConfirm: async () => {
+          await apiFetch(`/api/books/${id}`, { method: 'DELETE' });
+          showToast(`"${title}" deleted successfully`, 'info');
+          loadBooks(currentPage);
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

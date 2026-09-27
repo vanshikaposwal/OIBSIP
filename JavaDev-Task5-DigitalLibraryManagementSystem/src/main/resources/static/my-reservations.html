@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Reservations — LibSphere</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+          <i class="bi bi-book-half"></i>
+          <span>LibSphere</span>
+        </a>
+        <button class="sidebar-close-btn" id="sidebar-close-btn">&times;</button>
+      </div>
+
+      <div class="sidebar-body">
+        <div class="nav-section-title">Navigation</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/dashboard.html" class="nav-link" id="nav-dashboard">
+              <i class="bi bi-speedometer2"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="/browse.html" class="nav-link" id="nav-browse">
+              <i class="bi bi-grid-3x3-gap-fill"></i>
+              <span>Browse Catalog</span>
+            </a>
+          </li>
+        </ul>
+
+        <div id="user-nav-section">
+          <div class="nav-section-title">My Account</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/my-books.html" class="nav-link" id="nav-my-books">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>My Borrowed Books</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-reservations.html" class="nav-link" id="nav-my-reservations">
+                <i class="bi bi-bookmark-check"></i>
+                <span>My Reservations</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-fines.html" class="nav-link" id="nav-my-fines">
+                <i class="bi bi-cash-stack"></i>
+                <span>My Fines</span>
+              </a>
+            </li>
+            <li>
+              <a href="/contact.html" class="nav-link" id="nav-contact">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>Help & Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="admin-nav-section" style="display: none;">
+          <div class="nav-section-title">Administration</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/admin-books.html" class="nav-link" id="nav-admin-books">
+                <i class="bi bi-book"></i>
+                <span>Manage Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-issues.html" class="nav-link" id="nav-admin-issues">
+                <i class="bi bi-arrow-left-right"></i>
+                <span>Issues & Returns</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-users.html" class="nav-link" id="nav-admin-users">
+                <i class="bi bi-people-fill"></i>
+                <span>Users & Roles</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-fines.html" class="nav-link" id="nav-admin-fines">
+                <i class="bi bi-currency-rupee"></i>
+                <span>Fines Ledger</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-queries.html" class="nav-link" id="nav-admin-queries">
+                <i class="bi bi-inbox-fill"></i>
+                <span>Member Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sidebar-footer" id="sidebar-user-section"></div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <i class="bi bi-list"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>My Book Reservations</h1>
+            <p>Waitlist queue for currently checked-out volumes</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <a href="/browse.html" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> Find More Books</a>
+        </div>
+      </header>
+
+      <main class="page-content">
+
+        <div class="card" style="margin-bottom: 1.5rem; background: var(--color-indigo-subtle); border-color: #C7D2FE;">
+          <div class="card-body" style="padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem;">
+            <i class="bi bi-info-circle-fill" style="font-size: 1.25rem; color: var(--color-indigo);"></i>
+            <div style="font-size: 0.85rem; color: #1E1B4B;">
+              <strong>How reservations work:</strong> When a book has 0 available copies, you can join the reservation waitlist. Once any user returns a copy, your reservation is fulfilled in the order it was placed.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Book Title</th>
+                  <th>Reservation Date</th>
+                  <th>Fulfilled Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="res-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="pagination-container"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let currentPage = 0;
+
+    async function init() {
+      const user = await requireAuth();
+      if (!user) return;
+      await initLayout('my-reservations');
+      loadReservations();
+    }
+
+    async function loadReservations(page = 0) {
+      currentPage = page;
+      const tbody = document.getElementById('res-table-body');
+      tbody.innerHTML = renderSkeletonRows(5, 3);
+
+      try {
+        const pageData = await apiFetch(`/api/reservations/my?page=${page}&size=15`);
+        const items = pageData.content || [];
+
+        if (items.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 3rem;">
+                ${renderEmptyState('No reservations active', 'You have not joined any book waitlists yet.', 'bi-bookmark-x', '<a href="/browse.html" class="btn btn-primary btn-sm">Explore Books</a>')}
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = items.map(r => `
+          <tr>
+            <td>
+              <strong style="color: var(--color-primary); font-size: 0.95rem;">${escapeHtml(r.bookTitle)}</strong>
+            </td>
+            <td>${formatDate(r.reservationDate)}</td>
+            <td>${r.fulfilledAt ? formatDate(r.fulfilledAt) : '<span style="color: var(--color-text-light);">&mdash;</span>'}</td>
+            <td>${renderBadge(r.status)}</td>
+            <td>
+              ${r.status === 'ACTIVE'
+                ? `<button class="btn btn-secondary btn-sm" style="color: var(--color-danger); border-color: var(--color-border);" onclick="handleCancel(${r.id}, '${escapeHtml(r.bookTitle)}')">
+                     <i class="bi bi-x-circle"></i> Cancel
+                   </button>`
+                : `<span style="font-size: 0.8rem; color: var(--color-text-light);">&mdash;</span>`
+              }
+            </td>
+          </tr>
+        `).join('');
+
+        document.getElementById('pagination-container').innerHTML = renderPagination(pageData, 'loadReservations');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--color-danger); padding: 2rem;">Failed to load reservations: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function formatDate(dt) {
+      if (!dt) return '';
+      return dt.replace('T', ' ').substring(0, 16);
+    }
+
+    async function handleCancel(resId, bookTitle) {
+      showConfirmModal({
+        title: 'Cancel Reservation',
+        message: `Cancel your waitlist reservation for "${bookTitle}"?`,
+        confirmText: 'Yes, Cancel',
+        isDanger: true,
+        onConfirm: async () => {
+          await apiFetch(`/api/reservations/${resId}/cancel`, { method: 'POST' });
+          showToast('Reservation cancelled', 'info');
+          loadReservations(currentPage);
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

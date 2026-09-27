@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — Digital Library Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/css/common.css">
+</head>
+<body class="auth-page">
+
+  <div class="auth-card">
+    <div class="auth-header">
+      <a href="/" class="auth-brand">
+        <i class="bi bi-book-half"></i>
+        <span>LibSphere</span>
+      </a>
+      <p class="auth-subtitle">Sign in to your library account</p>
+    </div>
+
+    <div id="login-alert" style="display: none; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.85rem;" class="badge-danger"></div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <div class="search-input-wrapper">
+          <i class="bi bi-envelope"></i>
+          <input type="email" id="email" class="form-control" placeholder="name@example.com" required autofocus>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <div class="search-input-wrapper">
+          <i class="bi bi-lock"></i>
+          <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-size: 0.825rem;">
+        <label style="display: flex; align-items: center; gap: 0.4rem; cursor: pointer; color: var(--color-text-muted);">
+          <input type="checkbox" id="remember-me" checked> Remember session
+        </label>
+        <a href="/contact.html" style="color: var(--color-indigo); font-weight: 500;">Need help?</a>
+      </div>
+
+      <button type="submit" id="login-btn" class="btn btn-primary btn-lg" style="width: 100%;">
+        <i class="bi bi-box-arrow-in-right"></i> Sign In
+      </button>
+    </form>
+
+    <div class="demo-logins">
+      <div class="demo-logins-title"><i class="bi bi-key-fill"></i> Quick Demo Logins</div>
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="fillCredentials('admin@library.com', 'Admin@123')">
+          <i class="bi bi-shield-lock"></i> Admin
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="fillCredentials('alice@example.com', 'Alice@123')">
+          <i class="bi bi-person"></i> Alice Sharma
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="fillCredentials('bob@example.com', 'Bob@12345')">
+          <i class="bi bi-person"></i> Bob Kumar
+        </button>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 1.75rem; font-size: 0.875rem; color: var(--color-text-muted);">
+      Don't have an account? <a href="/register.html" style="font-weight: 600;">Create one now</a>
+    </div>
+    <div style="text-align: center; margin-top: 0.75rem; font-size: 0.825rem;">
+      <a href="/browse.html" style="color: var(--color-text-muted);"><i class="bi bi-arrow-left"></i> Browse Books as Guest</a>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    function fillCredentials(email, pwd) {
+      document.getElementById('email').value = email;
+      document.getElementById('password').value = pwd;
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const alertBox = document.getElementById('login-alert');
+      alertBox.style.display = 'none';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('login-btn');
+
+      setButtonLoading(btn, true);
+
+      try {
+        const user = await apiFetch('/api/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password })
+        });
+
+        showToast(`Welcome back, ${user.name}!`, 'success');
+
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get('redirect');
+
+        setTimeout(() => {
+          if (redirect && redirect.startsWith('/') && !redirect.startsWith('//')) {
+            window.location.href = redirect;
+          } else {
+            window.location.href = user.role === 'ROLE_ADMIN' ? '/dashboard.html' : '/browse.html';
+          }
+        }, 500);
+      } catch (err) {
+        alertBox.textContent = err.data?.message || err.message || 'Invalid email or password';
+        alertBox.style.display = 'block';
+        setButtonLoading(btn, false, '<i class="bi bi-box-arrow-in-right"></i> Sign In');
+      }
+    });
+
+    // If already logged in, redirect
+    getCurrentUser().then(u => {
+      if (u) {
+        window.location.href = u.role === 'ROLE_ADMIN' ? '/dashboard.html' : '/browse.html';
+      }
+    });
+  </script>
+</body>
+</html>

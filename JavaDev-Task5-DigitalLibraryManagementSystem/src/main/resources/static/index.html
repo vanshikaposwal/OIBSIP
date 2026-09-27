@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LibSphere — Modern Digital Library Management System</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/css/common.css">
+  <style>
+    .hero-section {
+      background: radial-gradient(circle at 10% 20%, #1E1B4B 0%, #0F172A 90%);
+      color: #FFFFFF;
+      padding: 5rem 1.5rem 4rem 1.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-title {
+      font-size: 2.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #FFFFFF 40%, #A5B4FC 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+      font-size: 1.15rem;
+      color: #94A3B8;
+      max-width: 600px;
+      margin: 0 auto 2.25rem auto;
+      line-height: 1.6;
+    }
+    .hero-search-box {
+      max-width: 580px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .hero-search-box input {
+      height: 56px;
+      border-radius: var(--radius-pill);
+      padding-left: 3rem;
+      padding-right: 7.5rem;
+      font-size: 1rem;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.15);
+      background: #FFFFFF;
+      color: var(--color-primary);
+    }
+    .hero-search-box i {
+      position: absolute;
+      left: 1.25rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.25rem;
+      color: var(--color-indigo);
+    }
+    .hero-search-box button {
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      bottom: 6px;
+      border-radius: var(--radius-pill);
+      padding: 0 1.5rem;
+    }
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+      margin-top: 3.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .stat-item {
+      text-align: center;
+    }
+    .stat-number {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #FFFFFF;
+    }
+    .stat-text {
+      font-size: 0.8rem;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .feature-card {
+      padding: 2rem;
+      border-radius: var(--radius-card);
+      background: #FFFFFF;
+      border: 1px solid var(--color-border);
+      text-align: center;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+    .feature-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.65rem;
+      margin-bottom: 1.25rem;
+    }
+  </style>
+</head>
+<body style="background: var(--color-bg);">
+
+  <!-- Navbar -->
+  <header style="background: #FFFFFF; border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 100;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0.9rem 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+      <a href="/" class="auth-brand" style="margin-bottom: 0;">
+        <i class="bi bi-book-half" style="color: var(--color-indigo); font-size: 1.75rem;"></i>
+        <span style="font-weight: 800; font-size: 1.25rem; color: var(--color-primary);">LibSphere</span>
+      </a>
+
+      <nav style="display: flex; align-items: center; gap: 1.5rem;">
+        <a href="/browse.html" style="font-weight: 500; color: var(--color-text-main);">Browse Catalog</a>
+        <a href="/contact.html" style="font-weight: 500; color: var(--color-text-main);">Help & Support</a>
+        <div id="nav-auth-slot" style="display: flex; gap: 0.75rem;">
+          <a href="/login.html" class="btn btn-secondary btn-sm">Sign In</a>
+          <a href="/register.html" class="btn btn-primary btn-sm">Join Library</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div style="max-width: 900px; margin: 0 auto;">
+      <span class="badge badge-primary" style="margin-bottom: 1rem; padding: 0.35rem 0.85rem; font-size: 0.8rem;">
+        <i class="bi bi-stars"></i> Next-Generation Digital Library
+      </span>
+      <h1 class="hero-title">Explore, Reserve & Borrow Books Seamlessly</h1>
+      <p class="hero-subtitle">
+        Access thousands of curated engineering, computing, science, and literature titles with real-time stock availability, instant digital reservations, and automated return tracking.
+      </p>
+
+      <form id="hero-search-form" class="hero-search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" id="hero-query" placeholder="Search by title, author, or ISBN (e.g. Java, Martin, 978)..." required>
+        <button type="submit" class="btn btn-primary">Find Books</button>
+      </form>
+
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-number">14 Days</div>
+          <div class="stat-text">Flexible Loan Window</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">Instant</div>
+          <div class="stat-text">Pessimistic-Locked Reserves</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">₹5 / Day</div>
+          <div class="stat-text">Transparent Overdue Rules</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">Zero Paper</div>
+          <div class="stat-text">Digital Borrowing Ledger</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Container -->
+  <main style="max-width: 1200px; margin: 0 auto; padding: 3.5rem 1.5rem;">
+
+    <!-- Featured Categories -->
+    <div style="margin-bottom: 3.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--color-primary);">Browse by Subject</h2>
+          <p style="font-size: 0.875rem; color: var(--color-text-muted);">Explore hand-picked collections across core computer science and engineering disciplines</p>
+        </div>
+        <a href="/browse.html" class="btn btn-outline-primary btn-sm">All Categories <i class="bi bi-arrow-right"></i></a>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="/browse.html?category=Java" class="btn btn-secondary"><i class="bi bi-cup-hot-fill" style="color: #EA580C;"></i> Java</a>
+        <a href="/browse.html?category=Programming" class="btn btn-secondary"><i class="bi bi-code-slash" style="color: #4F46E5;"></i> Programming</a>
+        <a href="/browse.html?category=Database" class="btn btn-secondary"><i class="bi bi-database-fill" style="color: #0284C7;"></i> Database</a>
+        <a href="/browse.html?category=Web Development" class="btn btn-secondary"><i class="bi bi-globe" style="color: #0D9488;"></i> Web Development</a>
+        <a href="/browse.html?category=Computer Science" class="btn btn-secondary"><i class="bi bi-cpu-fill" style="color: #7C3AED;"></i> Computer Science</a>
+        <a href="/browse.html?category=Fiction" class="btn btn-secondary"><i class="bi bi-book-fill" style="color: #DB2777;"></i> Fiction</a>
+        <a href="/browse.html?category=Science" class="btn btn-secondary"><i class="bi bi-capsule" style="color: #059669;"></i> Science</a>
+        <a href="/browse.html?category=History" class="btn btn-secondary"><i class="bi bi-hourglass-split" style="color: #B45309;"></i> History</a>
+      </div>
+    </div>
+
+    <!-- Featured Books Section -->
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+        <div>
+          <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--color-primary);">Featured in Library</h2>
+          <p style="font-size: 0.875rem; color: var(--color-text-muted);">Popular, high-demand volumes ready to borrow or reserve</p>
+        </div>
+        <a href="/browse.html" class="btn btn-primary btn-sm">View Full Catalog <i class="bi bi-arrow-right"></i></a>
+      </div>
+
+      <div class="books-grid" id="featured-books-grid">
+        <!-- Rendered via JavaScript -->
+        <div class="card skeleton skeleton-card"></div>
+        <div class="card skeleton skeleton-card"></div>
+        <div class="card skeleton skeleton-card"></div>
+      </div>
+    </div>
+
+    <!-- Features Grid -->
+    <div style="margin-top: 4.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.75rem;">
+      <div class="feature-card">
+        <div class="feature-icon" style="background: var(--color-indigo-subtle); color: var(--color-indigo);">
+          <i class="bi bi-lightning-charge-fill"></i>
+        </div>
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-primary);">Instant Borrowing</h3>
+        <p style="font-size: 0.875rem; color: var(--color-text-muted);">Issue available books in one click with real-time stock locking that prevents double allocations.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" style="background: var(--color-accent-subtle); color: var(--color-accent-violet);">
+          <i class="bi bi-bookmark-check-fill"></i>
+        </div>
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-primary);">Smart Reservations</h3>
+        <p style="font-size: 0.875rem; color: var(--color-text-muted);">When all copies are checked out, join the waitlist. Copies are auto-fulfilled to the oldest claimant upon return.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon" style="background: var(--color-success-bg); color: var(--color-success);">
+          <i class="bi bi-shield-check"></i>
+        </div>
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-primary);">Transparent Fines</h3>
+        <p style="font-size: 0.875rem; color: var(--color-text-muted);">Automated, deterministic overdue rate calculation (₹5/day) with clear receipts and online payment settlement.</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer style="background: #FFFFFF; border-top: 1px solid var(--color-border); padding: 2.5rem 1.5rem; margin-top: 4rem; text-align: center; color: var(--color-text-muted); font-size: 0.85rem;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+      <div class="auth-brand" style="margin-bottom: 0;">
+        <i class="bi bi-book-half" style="color: var(--color-indigo); font-size: 1.5rem;"></i>
+        <span style="font-weight: 800; font-size: 1.1rem; color: var(--color-primary);">LibSphere</span>
+      </div>
+      <p>Digital Library Management System &copy; 2026. Built with Spring Boot 3, JPA, MySQL, Flyway &amp; Vanilla JS.</p>
+      <div style="display: flex; gap: 1.5rem;">
+        <a href="/browse.html">Catalog</a>
+        <a href="/contact.html">Contact Support</a>
+        <a href="/login.html">Member Portal</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/common.js"></script>
+  <script>
+    // Search redirect
+    document.getElementById('hero-search-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const q = document.getElementById('hero-query').value.trim();
+      if (q) {
+        window.location.href = `/browse.html?query=${encodeURIComponent(q)}`;
+      }
+    });
+
+    // Check auth status for navbar
+    getCurrentUser().then(user => {
+      const slot = document.getElementById('nav-auth-slot');
+      if (user && slot) {
+        slot.innerHTML = `
+          <a href="/dashboard.html" class="btn btn-primary btn-sm">
+            <i class="bi bi-grid-fill"></i> ${user.role === 'ROLE_ADMIN' ? 'Admin Dashboard' : 'My Dashboard'}
+          </a>
+        `;
+      }
+    });
+
+    // Load featured books
+    async function loadFeaturedBooks() {
+      const grid = document.getElementById('featured-books-grid');
+      try {
+        const page = await apiFetch('/api/books?page=0&size=6&sortBy=totalQuantity&dir=desc');
+        if (!page.content || page.content.length === 0) {
+          grid.innerHTML = renderEmptyState('No books available', 'Check back later as new books are added.', 'bi-book');
+          return;
+        }
+
+        grid.innerHTML = page.content.map(b => `
+          <div class="card book-card">
+            <div class="book-card-top">
+              ${generateBookCover(b.title, b.category)}
+              <div class="book-info">
+                <div class="book-category-tag">${escapeHtml(b.category)}</div>
+                <h3 class="book-title" title="${escapeHtml(b.title)}">${escapeHtml(b.title)}</h3>
+                <p class="book-author">by ${escapeHtml(b.author)}</p>
+                <div class="book-isbn">ISBN: ${escapeHtml(b.isbn)}</div>
+                <div class="book-stock">
+                  ${b.availableQuantity > 0
+                    ? `<span class="badge badge-success"><i class="bi bi-check-circle"></i> ${b.availableQuantity} of ${b.totalQuantity} Available</span>`
+                    : `<span class="badge badge-danger"><i class="bi bi-x-circle"></i> Out of Stock</span>`}
+                </div>
+              </div>
+            </div>
+            <div class="book-card-bottom">
+              <a href="/browse.html?query=${encodeURIComponent(b.title)}" class="btn btn-outline-primary btn-sm" style="width: 100%;">
+                <i class="bi bi-eye"></i> View in Catalog
+              </a>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        grid.innerHTML = `<div style="grid-column: 1 / -1; padding: 2rem; text-align: center; color: var(--color-danger);">Failed to load books. Please ensure database is configured.</div>`;
+      }
+    }
+
+    loadFeaturedBooks();
+  </script>
+</body>
+</html>

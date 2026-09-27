@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fines &amp; Penalties Ledger — Admin | LibSphere</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+          <i class="bi bi-book-half"></i>
+          <span>LibSphere</span>
+        </a>
+        <button class="sidebar-close-btn" id="sidebar-close-btn">&times;</button>
+      </div>
+
+      <div class="sidebar-body">
+        <div class="nav-section-title">Navigation</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/dashboard.html" class="nav-link" id="nav-dashboard">
+              <i class="bi bi-speedometer2"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="/browse.html" class="nav-link" id="nav-browse">
+              <i class="bi bi-grid-3x3-gap-fill"></i>
+              <span>Browse Catalog</span>
+            </a>
+          </li>
+        </ul>
+
+        <div id="user-nav-section">
+          <div class="nav-section-title">My Account</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/my-books.html" class="nav-link" id="nav-my-books">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>My Borrowed Books</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-reservations.html" class="nav-link" id="nav-my-reservations">
+                <i class="bi bi-bookmark-check"></i>
+                <span>My Reservations</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-fines.html" class="nav-link" id="nav-my-fines">
+                <i class="bi bi-cash-stack"></i>
+                <span>My Fines</span>
+              </a>
+            </li>
+            <li>
+              <a href="/contact.html" class="nav-link" id="nav-contact">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>Help & Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="admin-nav-section">
+          <div class="nav-section-title">Administration</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/admin-books.html" class="nav-link" id="nav-admin-books">
+                <i class="bi bi-book"></i>
+                <span>Manage Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-issues.html" class="nav-link" id="nav-admin-issues">
+                <i class="bi bi-arrow-left-right"></i>
+                <span>Issues & Returns</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-users.html" class="nav-link" id="nav-admin-users">
+                <i class="bi bi-people-fill"></i>
+                <span>Users & Roles</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-fines.html" class="nav-link" id="nav-admin-fines">
+                <i class="bi bi-currency-rupee"></i>
+                <span>Fines Ledger</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-queries.html" class="nav-link" id="nav-admin-queries">
+                <i class="bi bi-inbox-fill"></i>
+                <span>Member Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sidebar-footer" id="sidebar-user-section"></div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <i class="bi bi-list"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>Overdue Fines Master Ledger</h1>
+            <p>Monitor penalty assessments, settlement receipts, and uncollected dues</p>
+          </div>
+        </div>
+      </header>
+
+      <main class="page-content">
+
+        <!-- Filter tabs -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+          <button class="btn btn-primary btn-sm fines-filter-btn" onclick="filterFines('ALL', this)">All Fines</button>
+          <button class="btn btn-secondary btn-sm fines-filter-btn" onclick="filterFines('UNPAID', this)">Unpaid / Due Only</button>
+          <button class="btn btn-secondary btn-sm fines-filter-btn" onclick="filterFines('PAID', this)">Paid &amp; Settled</button>
+        </div>
+
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Fine Ref #</th>
+                  <th>Borrower</th>
+                  <th>Book Title</th>
+                  <th>Fine Amount</th>
+                  <th>Status</th>
+                  <th>Paid Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="fines-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="pagination-container"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let currentPage = 0;
+    let currentFilter = 'ALL';
+    let allFines = [];
+
+    async function init() {
+      const user = await requireAuth('ROLE_ADMIN');
+      if (!user) return;
+      await initLayout('admin-fines');
+      loadFines();
+    }
+
+    function filterFines(f, btn) {
+      currentFilter = f;
+      document.querySelectorAll('.fines-filter-btn').forEach(b => {
+        b.classList.remove('btn-primary');
+        b.classList.add('btn-secondary');
+      });
+      btn.classList.remove('btn-secondary');
+      btn.classList.add('btn-primary');
+      renderTable();
+    }
+
+    async function loadFines(page = 0) {
+      currentPage = page;
+      const tbody = document.getElementById('fines-table-body');
+      tbody.innerHTML = renderSkeletonRows(7, 5);
+
+      try {
+        const pageData = await apiFetch(`/api/fines?page=${page}&size=25`);
+        allFines = pageData.content || [];
+        renderTable(pageData);
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--color-danger); padding: 2rem;">Failed to load fines: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function renderTable(pageData = null) {
+      const tbody = document.getElementById('fines-table-body');
+      let filtered = allFines;
+
+      if (currentFilter === 'UNPAID') {
+        filtered = allFines.filter(f => !f.paid);
+      } else if (currentFilter === 'PAID') {
+        filtered = allFines.filter(f => f.paid);
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 3rem;">${renderEmptyState('No fines recorded in this view', '')}</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(f => `
+        <tr>
+          <td><code>FIN-${f.id.toString().padStart(4, '0')}</code></td>
+          <td>
+            <strong>${escapeHtml(f.userName)}</strong>
+            <div style="font-size: 0.75rem; color: var(--color-text-light);">User ID: #${f.userId}</div>
+          </td>
+          <td><strong style="color: var(--color-primary);">${escapeHtml(f.bookTitle)}</strong></td>
+          <td><strong style="color: ${f.paid ? 'var(--color-text-main)' : 'var(--color-danger)'};">₹${Number(f.amount).toFixed(2)}</strong></td>
+          <td>${renderBadge(f.paid ? 'PAID' : 'UNPAID')}</td>
+          <td>${f.paidAt ? f.paidAt.replace('T', ' ').substring(0, 16) : '<span style="color: var(--color-text-light);">&mdash;</span>'}</td>
+          <td>
+            ${!f.paid
+              ? `<button class="btn btn-success btn-sm" onclick="handleMarkPaid(${f.id}, '${escapeHtml(f.userName)}', ${f.amount})">
+                   <i class="bi bi-check-circle"></i> Settle
+                 </button>`
+              : `<span style="font-size: 0.8rem; color: var(--color-success); font-weight: 600;"><i class="bi bi-check-all"></i> Settled</span>`
+            }
+          </td>
+        </tr>
+      `).join('');
+
+      if (pageData) {
+        document.getElementById('pagination-container').innerHTML = renderPagination(pageData, 'loadFines');
+      }
+    }
+
+    async function handleMarkPaid(fineId, userName, amount) {
+      showConfirmModal({
+        title: 'Settle Overdue Fine',
+        message: `Mark fine of ₹${Number(amount).toFixed(2)} for ${userName} as paid?`,
+        confirmText: 'Mark as Paid',
+        onConfirm: async () => {
+          await apiFetch(`/api/fines/${fineId}/pay`, { method: 'POST' });
+          showToast(`Fine #${fineId} settled successfully`, 'success');
+          loadFines(currentPage);
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

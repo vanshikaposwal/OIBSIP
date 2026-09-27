@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — LibSphere</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+          <i class="bi bi-book-half"></i>
+          <span>LibSphere</span>
+        </a>
+        <button class="sidebar-close-btn" id="sidebar-close-btn">&times;</button>
+      </div>
+
+      <div class="sidebar-body">
+        <div class="nav-section-title">Navigation</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/dashboard.html" class="nav-link" id="nav-dashboard">
+              <i class="bi bi-speedometer2"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="/browse.html" class="nav-link" id="nav-browse">
+              <i class="bi bi-grid-3x3-gap-fill"></i>
+              <span>Browse Catalog</span>
+            </a>
+          </li>
+        </ul>
+
+        <div id="user-nav-section">
+          <div class="nav-section-title">My Account</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/my-books.html" class="nav-link" id="nav-my-books">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>My Borrowed Books</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-reservations.html" class="nav-link" id="nav-my-reservations">
+                <i class="bi bi-bookmark-check"></i>
+                <span>My Reservations</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-fines.html" class="nav-link" id="nav-my-fines">
+                <i class="bi bi-cash-stack"></i>
+                <span>My Fines</span>
+              </a>
+            </li>
+            <li>
+              <a href="/contact.html" class="nav-link" id="nav-contact">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>Help & Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="admin-nav-section" style="display: none;">
+          <div class="nav-section-title">Administration</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/admin-books.html" class="nav-link" id="nav-admin-books">
+                <i class="bi bi-book"></i>
+                <span>Manage Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-issues.html" class="nav-link" id="nav-admin-issues">
+                <i class="bi bi-arrow-left-right"></i>
+                <span>Issues & Returns</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-users.html" class="nav-link" id="nav-admin-users">
+                <i class="bi bi-people-fill"></i>
+                <span>Users & Roles</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-fines.html" class="nav-link" id="nav-admin-fines">
+                <i class="bi bi-currency-rupee"></i>
+                <span>Fines Ledger</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-queries.html" class="nav-link" id="nav-admin-queries">
+                <i class="bi bi-inbox-fill"></i>
+                <span>Member Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sidebar-footer" id="sidebar-user-section"></div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <i class="bi bi-list"></i>
+          </button>
+          <div class="page-title-box">
+            <h1 id="dash-heading">Dashboard</h1>
+            <p id="dash-subheading">Welcome back to the library</p>
+          </div>
+        </div>
+        <div class="topbar-right" id="dash-top-actions">
+          <a href="/browse.html" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> Search Books</a>
+        </div>
+      </header>
+
+      <main class="page-content">
+
+        <!-- Metrics Row -->
+        <div class="metrics-grid" id="metrics-container">
+          <div class="card skeleton" style="height: 100px;"></div>
+          <div class="card skeleton" style="height: 100px;"></div>
+          <div class="card skeleton" style="height: 100px;"></div>
+          <div class="card skeleton" style="height: 100px;"></div>
+        </div>
+
+        <!-- Role Specific Main Area -->
+        <div id="role-main-area">
+          <!-- Populated by JS -->
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let user = null;
+
+    async function init() {
+      user = await requireAuth();
+      if (!user) return;
+      await initLayout('dashboard');
+
+      document.getElementById('dash-heading').textContent = user.role === 'ROLE_ADMIN' ? 'Admin Overview' : `Welcome, ${user.name}!`;
+      document.getElementById('dash-subheading').textContent = user.role === 'ROLE_ADMIN'
+        ? 'Real-time overview of library circulation, inventory, and fines'
+        : 'Track your borrowed books, active waitlists, and fine statements';
+
+      if (user.role === 'ROLE_ADMIN') {
+        renderAdminDashboard();
+      } else {
+        renderUserDashboard();
+      }
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // Admin Dashboard View
+    // ────────────────────────────────────────────────────────────────────────
+    async function renderAdminDashboard() {
+      const topActions = document.getElementById('dash-top-actions');
+      topActions.innerHTML = `
+        <a href="/admin-books.html" class="btn btn-secondary btn-sm"><i class="bi bi-plus-circle"></i> Add Book</a>
+        <a href="/admin-issues.html" class="btn btn-primary btn-sm"><i class="bi bi-box-arrow-right"></i> Issue Book</a>
+      `;
+
+      try {
+        const [booksData, issuesData, finesData, queriesData] = await Promise.all([
+          apiFetch('/api/books?size=1'),
+          apiFetch('/api/issues?size=100'),
+          apiFetch('/api/fines?size=100'),
+          apiFetch('/api/queries?size=100')
+        ]);
+
+        const totalBooks = booksData.totalElements || 0;
+        const issues = issuesData.content || [];
+        const activeIssues = issues.filter(i => i.status === 'ISSUED' || i.status === 'OVERDUE').length;
+        const overdueIssues = issues.filter(i => i.status === 'OVERDUE').length;
+
+        const fines = finesData.content || [];
+        const unpaidFinesTotal = fines.filter(f => !f.paid)
+          .reduce((sum, f) => sum + Number(f.amount), 0);
+
+        const queries = queriesData.content || [];
+        const openQueries = queries.filter(q => q.status === 'OPEN').length;
+
+        document.getElementById('metrics-container').innerHTML = `
+          <div class="metric-card">
+            <div class="metric-icon-box metric-icon-indigo"><i class="bi bi-book-half"></i></div>
+            <div class="metric-data">
+              <div class="metric-label">Total Titles</div>
+              <div class="metric-value">${totalBooks}</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon-box metric-icon-violet"><i class="bi bi-arrow-left-right"></i></div>
+            <div class="metric-data">
+              <div class="metric-label">Active Loans</div>
+              <div class="metric-value">${activeIssues}</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon-box metric-icon-danger"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            <div class="metric-data">
+              <div class="metric-label">Overdue Issues</div>
+              <div class="metric-value">${overdueIssues}</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon-box metric-icon-warning"><i class="bi bi-currency-rupee"></i></div>
+            <div class="metric-data">
+              <div class="metric-label">Unpaid Fines</div>
+              <div class="metric-value">₹${unpaidFinesTotal.toFixed(0)}</div>
+            </div>
+          </div>
+        `;
+
+        // Recent issues table
+        const recentIssues = issues.slice(0, 8);
+        document.getElementById('role-main-area').innerHTML = `
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Recent Lending Activity</h3>
+                <p class="card-subtitle">Latest book issues and return requests</p>
+              </div>
+              <a href="/admin-issues.html" class="btn btn-secondary btn-sm">View All Issues</a>
+            </div>
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Borrower</th>
+                    <th>Book Title</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${recentIssues.length === 0
+                    ? `<tr><td colspan="6" class="text-center">${renderEmptyState('No issues yet', 'Start by issuing a book to a user')}</td></tr>`
+                    : recentIssues.map(i => `
+                      <tr>
+                        <td><strong>${escapeHtml(i.userName)}</strong></td>
+                        <td>${escapeHtml(i.bookTitle)}</td>
+                        <td>${escapeHtml(i.issueDate)}</td>
+                        <td>${escapeHtml(i.dueDate)}</td>
+                        <td>${renderBadge(i.status)}</td>
+                        <td>
+                          ${i.status !== 'RETURNED'
+                            ? `<button class="btn btn-outline-primary btn-sm" onclick="handleReturnIssue(${i.id}, '${escapeHtml(i.bookTitle)}')">
+                                 <i class="bi bi-arrow-return-left"></i> Return
+                               </button>`
+                            : `<span style="color: var(--color-text-light); font-size: 0.8rem;">Returned ${escapeHtml(i.returnDate || '')}</span>`
+                          }
+                        </td>
+                      </tr>
+                    `).join('')
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        showToast('Failed to load admin stats: ' + err.message, 'danger');
+      }
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // Member Dashboard View
+    // ────────────────────────────────────────────────────────────────────────
+    async function renderUserDashboard() {
+      try {
+        const [myIssuesData, myFinesData, myResData] = await Promise.all([
+          apiFetch('/api/issues/my?size=50'),
+          apiFetch('/api/fines/my?size=50'),
+          apiFetch('/api/reservations/my?size=50')
+        ]);
+
+        const issues = myIssuesData.content || [];
+        const activeIssues = issues.filter(i => i.status === 'ISSUED' || i.status === 'OVERDUE');
+        const overdueCount = issues.filter(i => i.status === 'OVERDUE').length;
+
+        const fines = myFinesData.content || [];
+        const unpaidFinesTotal = fines.filter(f => !f.paid)
+          .reduce((sum, f) => sum + Number(f.amount), 0);
+
+        const reservations = myResData.content || [];
+        const activeResCount = reservations.filter(r => r.status === 'ACTIVE').length;
+
+        document.getElementById('metrics-container').innerHTML = `
+          <div class="metric-card">
+            <div class="metric-icon-box metric-icon-indigo"><i class="bi bi-journal-bookmark-fill"></i></div>
+            <div class="metric-data">
+              <div class="metric-label">Currently Borrowed</div>
+              <div class="metric-value">${activeIssues.length}</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon-box ${overdueCount > 0 ? 'metric-icon-danger' : 'metric-icon-success'}">
+              <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="metric-data">
+              <div class="metric-label">Overdue Books</div>
+              <div class="metric-value">${overdueCount}</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon-box ${unpaidFinesTotal > 0 ? 'metric-icon-warning' : 'metric-icon-success'}">
+              <i class="bi bi-currency-rupee"></i>
+            </div>
+            <div class="metric-data">
+              <div class="metric-label">Unpaid Fines</div>
+              <div class="metric-value">₹${unpaidFinesTotal.toFixed(0)}</div>
+            </div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-icon-box metric-icon-violet"><i class="bi bi-bookmark-star-fill"></i></div>
+            <div class="metric-data">
+              <div class="metric-label">Waitlists / Reserves</div>
+              <div class="metric-value">${activeResCount}</div>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('role-main-area').innerHTML = `
+          <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Currently Borrowed Books (${activeIssues.length}/5)</h3>
+                <p class="card-subtitle">Books currently issued to your library account</p>
+              </div>
+              <a href="/my-books.html" class="btn btn-secondary btn-sm">Full History</a>
+            </div>
+            <div class="card-body" style="padding: 1.25rem;">
+              ${activeIssues.length === 0
+                ? renderEmptyState('No books currently borrowed', 'Explore our catalog and borrow a book today!', 'bi-journal-x', '<a href="/browse.html" class="btn btn-primary btn-sm">Browse Books</a>')
+                : `<div class="books-grid">
+                    ${activeIssues.map(issue => `
+                      <div class="card book-card" style="border: 1px solid var(--color-border-light);">
+                        <div class="book-card-top">
+                          ${generateBookCover(issue.bookTitle, 'General')}
+                          <div class="book-info">
+                            <h4 class="book-title" title="${escapeHtml(issue.bookTitle)}">${escapeHtml(issue.bookTitle)}</h4>
+                            <p class="book-author">by ${escapeHtml(issue.bookAuthor)}</p>
+                            <div style="font-size: 0.8rem; margin-top: 0.5rem;">
+                              <div><span style="color: var(--color-text-muted);">Issued:</span> ${escapeHtml(issue.issueDate)}</div>
+                              <div><span style="color: var(--color-text-muted);">Due:</span> <strong>${escapeHtml(issue.dueDate)}</strong></div>
+                            </div>
+                            <div style="margin-top: 0.5rem;">
+                              ${renderBadge(issue.status)}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="book-card-bottom">
+                          <button class="btn btn-outline-primary btn-sm" style="width: 100%;" onclick="handleReturnIssue(${issue.id}, '${escapeHtml(issue.bookTitle)}')">
+                            <i class="bi bi-arrow-return-left"></i> Return Book
+                          </button>
+                        </div>
+                      </div>
+                    `).join('')}
+                   </div>`
+              }
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        showToast('Failed to load user dashboard: ' + err.message, 'danger');
+      }
+    }
+
+    async function handleReturnIssue(issueId, bookTitle) {
+      showConfirmModal({
+        title: 'Return Book',
+        message: `Confirm return of "${bookTitle}"? If overdue, an overdue fine of ₹5/day will be calculated automatically.`,
+        confirmText: 'Confirm Return',
+        onConfirm: async () => {
+          await apiFetch(`/api/issues/${issueId}/return`, { method: 'POST' });
+          showToast(`"${bookTitle}" returned successfully!`, 'success');
+          init();
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Issues &amp; Returns — Admin | LibSphere</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/css/common.css">
+</head>
+<body>
+  <div class="app-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="/" class="sidebar-brand">
+          <i class="bi bi-book-half"></i>
+          <span>LibSphere</span>
+        </a>
+        <button class="sidebar-close-btn" id="sidebar-close-btn">&times;</button>
+      </div>
+
+      <div class="sidebar-body">
+        <div class="nav-section-title">Navigation</div>
+        <ul class="nav-list">
+          <li>
+            <a href="/dashboard.html" class="nav-link" id="nav-dashboard">
+              <i class="bi bi-speedometer2"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="/browse.html" class="nav-link" id="nav-browse">
+              <i class="bi bi-grid-3x3-gap-fill"></i>
+              <span>Browse Catalog</span>
+            </a>
+          </li>
+        </ul>
+
+        <div id="user-nav-section">
+          <div class="nav-section-title">My Account</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/my-books.html" class="nav-link" id="nav-my-books">
+                <i class="bi bi-journal-bookmark-fill"></i>
+                <span>My Borrowed Books</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-reservations.html" class="nav-link" id="nav-my-reservations">
+                <i class="bi bi-bookmark-check"></i>
+                <span>My Reservations</span>
+              </a>
+            </li>
+            <li>
+              <a href="/my-fines.html" class="nav-link" id="nav-my-fines">
+                <i class="bi bi-cash-stack"></i>
+                <span>My Fines</span>
+              </a>
+            </li>
+            <li>
+              <a href="/contact.html" class="nav-link" id="nav-contact">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>Help & Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div id="admin-nav-section">
+          <div class="nav-section-title">Administration</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/admin-books.html" class="nav-link" id="nav-admin-books">
+                <i class="bi bi-book"></i>
+                <span>Manage Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-issues.html" class="nav-link" id="nav-admin-issues">
+                <i class="bi bi-arrow-left-right"></i>
+                <span>Issues & Returns</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-users.html" class="nav-link" id="nav-admin-users">
+                <i class="bi bi-people-fill"></i>
+                <span>Users & Roles</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-fines.html" class="nav-link" id="nav-admin-fines">
+                <i class="bi bi-currency-rupee"></i>
+                <span>Fines Ledger</span>
+              </a>
+            </li>
+            <li>
+              <a href="/admin-queries.html" class="nav-link" id="nav-admin-queries">
+                <i class="bi bi-inbox-fill"></i>
+                <span>Member Queries</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sidebar-footer" id="sidebar-user-section"></div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobile-menu-btn">
+            <i class="bi bi-list"></i>
+          </button>
+          <div class="page-title-box">
+            <h1>Master Lending &amp; Issues Ledger</h1>
+            <p>Track all loans, overdue book returns, and perform admin check-outs</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary btn-sm" onclick="openIssueModal()">
+            <i class="bi bi-box-arrow-right"></i> Issue Book to Member
+          </button>
+        </div>
+      </header>
+
+      <main class="page-content">
+
+        <!-- Status Filter Tabs -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+          <button class="btn btn-primary btn-sm status-filter-btn" onclick="filterStatus('ALL', this)">All Records</button>
+          <button class="btn btn-secondary btn-sm status-filter-btn" onclick="filterStatus('ACTIVE', this)">Active Loans</button>
+          <button class="btn btn-secondary btn-sm status-filter-btn" onclick="filterStatus('OVERDUE', this)">Overdue Only</button>
+          <button class="btn btn-secondary btn-sm status-filter-btn" onclick="filterStatus('RETURNED', this)">Returned</button>
+        </div>
+
+        <div class="card">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Issue #</th>
+                  <th>Borrower</th>
+                  <th>Book Title</th>
+                  <th>Issue Date</th>
+                  <th>Due Date</th>
+                  <th>Return Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="issues-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="pagination-container"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Issue Book to User Modal -->
+  <div class="modal-backdrop" id="admin-issue-modal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Issue Book on Behalf of User</h3>
+        <button type="button" class="modal-close" onclick="closeIssueModal()">&times;</button>
+      </div>
+      <form id="admin-issue-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="select-user">Select Member *</label>
+            <select id="select-user" class="form-select" required>
+              <option value="">Loading members...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="select-book">Select Book *</label>
+            <select id="select-book" class="form-select" required>
+              <option value="">Loading books with available stock...</option>
+            </select>
+          </div>
+
+          <div style="background: var(--color-bg); padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--color-border); font-size: 0.8rem; color: var(--color-text-muted);">
+            <i class="bi bi-info-circle"></i> Enforces: 14-day loan term, maximum 5 active loans per member, duplicate active issue check, and block on unpaid overdue fines.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeIssueModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="issue-submit-btn">Issue Book</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/common.js"></script>
+  <script>
+    let currentPage = 0;
+    let currentStatusFilter = 'ALL';
+    let rawIssues = [];
+
+    async function init() {
+      const user = await requireAuth('ROLE_ADMIN');
+      if (!user) return;
+      await initLayout('admin-issues');
+      loadIssues();
+    }
+
+    function filterStatus(status, btn) {
+      currentStatusFilter = status;
+      document.querySelectorAll('.status-filter-btn').forEach(b => {
+        b.classList.remove('btn-primary');
+        b.classList.add('btn-secondary');
+      });
+      btn.classList.remove('btn-secondary');
+      btn.classList.add('btn-primary');
+      renderTable();
+    }
+
+    async function loadIssues(page = 0) {
+      currentPage = page;
+      const tbody = document.getElementById('issues-table-body');
+      tbody.innerHTML = renderSkeletonRows(8, 5);
+
+      try {
+        const pageData = await apiFetch(`/api/issues?page=${page}&size=25`);
+        rawIssues = pageData.content || [];
+        renderTable(pageData);
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--color-danger); padding: 2rem;">Failed to load issues: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function renderTable(pageData = null) {
+      const tbody = document.getElementById('issues-table-body');
+      let filtered = rawIssues;
+
+      if (currentStatusFilter === 'ACTIVE') {
+        filtered = rawIssues.filter(i => i.status === 'ISSUED' || i.status === 'OVERDUE');
+      } else if (currentStatusFilter === 'OVERDUE') {
+        filtered = rawIssues.filter(i => i.status === 'OVERDUE');
+      } else if (currentStatusFilter === 'RETURNED') {
+        filtered = rawIssues.filter(i => i.status === 'RETURNED');
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 3rem;">${renderEmptyState('No issues matching this view', 'Circulation records will appear here.')}</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(i => `
+        <tr>
+          <td><code>ISS-${i.id.toString().padStart(4, '0')}</code></td>
+          <td>
+            <strong>${escapeHtml(i.userName)}</strong>
+            <div style="font-size: 0.75rem; color: var(--color-text-light);">User ID: #${i.userId}</div>
+          </td>
+          <td>
+            <strong style="color: var(--color-primary);">${escapeHtml(i.bookTitle)}</strong>
+            <div style="font-size: 0.75rem; color: var(--color-text-light);">by ${escapeHtml(i.bookAuthor)}</div>
+          </td>
+          <td>${escapeHtml(i.issueDate)}</td>
+          <td><strong style="${i.status === 'OVERDUE' ? 'color: var(--color-danger);' : ''}">${escapeHtml(i.dueDate)}</strong></td>
+          <td>${i.returnDate ? escapeHtml(i.returnDate) : '<span style="color: var(--color-text-light);">&mdash;</span>'}</td>
+          <td>${renderBadge(i.status)}</td>
+          <td>
+            ${i.status !== 'RETURNED'
+              ? `<button class="btn btn-outline-primary btn-sm" onclick="handleReturn(${i.id}, '${escapeHtml(i.bookTitle)}')">
+                   <i class="bi bi-arrow-return-left"></i> Return
+                 </button>`
+              : `<span style="font-size: 0.8rem; color: var(--color-text-light);">Returned</span>`
+            }
+          </td>
+        </tr>
+      `).join('');
+
+      if (pageData) {
+        document.getElementById('pagination-container').innerHTML = renderPagination(pageData, 'loadIssues');
+      }
+    }
+
+    async function handleReturn(issueId, bookTitle) {
+      showConfirmModal({
+        title: 'Return Book',
+        message: `Mark "${bookTitle}" as returned? If overdue, an overdue fine of ₹5/day is automatically assessed and active reservations fulfilled.`,
+        confirmText: 'Process Return',
+        onConfirm: async () => {
+          await apiFetch(`/api/issues/${issueId}/return`, { method: 'POST' });
+          showToast(`"${bookTitle}" returned successfully!`, 'success');
+          loadIssues(currentPage);
+        }
+      });
+    }
+
+    async function openIssueModal() {
+      document.getElementById('admin-issue-modal').classList.add('show');
+      const userSelect = document.getElementById('select-user');
+      const bookSelect = document.getElementById('select-book');
+
+      userSelect.innerHTML = '<option value="">Loading users...</option>';
+      bookSelect.innerHTML = '<option value="">Loading books...</option>';
+
+      try {
+        const [usersData, booksData] = await Promise.all([
+          apiFetch('/api/admin/users?size=100'),
+          apiFetch('/api/books?size=100&sortBy=title&dir=asc')
+        ]);
+
+        const users = (usersData.content || []).filter(u => u.enabled);
+        const books = (booksData.content || []).filter(b => b.availableQuantity > 0);
+
+        userSelect.innerHTML = '<option value="">-- Choose Member --</option>' +
+          users.map(u => `<option value="${u.id}">${escapeHtml(u.name)} (${escapeHtml(u.email)})</option>`).join('');
+
+        bookSelect.innerHTML = '<option value="">-- Choose Book (In Stock) --</option>' +
+          books.map(b => `<option value="${b.id}">${escapeHtml(b.title)} (${b.availableQuantity} available)</option>`).join('');
+      } catch (err) {
+        showToast('Failed to load users or books: ' + err.message, 'danger');
+      }
+    }
+
+    function closeIssueModal() {
+      document.getElementById('admin-issue-modal').classList.remove('show');
+    }
+
+    document.getElementById('admin-issue-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userId = document.getElementById('select-user').value;
+      const bookId = document.getElementById('select-book').value;
+      const btn = document.getElementById('issue-submit-btn');
+
+      if (!userId || !bookId) {
+        showToast('Please select both a member and a book', 'warning');
+        return;
+      }
+
+      setButtonLoading(btn, true);
+
+      try {
+        await apiFetch(`/api/issues/admin/book/${bookId}/user/${userId}`, { method: 'POST' });
+        showToast('Book issued successfully!', 'success');
+        closeIssueModal();
+        loadIssues(0);
+      } catch (err) {
+        showToast('Issue failed: ' + err.message, 'danger');
+      } finally {
+        setButtonLoading(btn, false, 'Issue Book');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
