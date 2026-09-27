@@ -40,13 +40,26 @@ public class SecurityConfig {
             .csrf(csrf -> csrf
                 .csrfTokenRepository(csrfRepo)
                 .csrfTokenRequestHandler(csrfHandler))
+            .addFilterAfter(new org.springframework.web.filter.OncePerRequestFilter() {
+                @Override
+                protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request,
+                                                jakarta.servlet.http.HttpServletResponse response,
+                                                jakarta.servlet.FilterChain filterChain)
+                        throws jakarta.servlet.ServletException, java.io.IOException {
+                    org.springframework.security.web.csrf.CsrfToken csrfToken =
+                            (org.springframework.security.web.csrf.CsrfToken) request.getAttribute(org.springframework.security.web.csrf.CsrfToken.class.getName());
+                    if (csrfToken != null) {
+                        csrfToken.getToken();
+                    }
+                    filterChain.doFilter(request, response);
+                }
+            }, org.springframework.security.web.authentication.www.BasicAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 // Static assets
                 .requestMatchers(HttpMethod.GET,
-                        "/", "/index.html", "/login.html", "/register.html",
-                        "/css/**", "/js/**", "/favicon.ico").permitAll()
+                        "/", "/*.html", "/css/**", "/js/**", "/favicon.ico").permitAll()
                 // Public API
-                .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/queries").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/auth/me").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
                 // Admin APIs
