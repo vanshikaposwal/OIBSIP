@@ -5,6 +5,9 @@ import com.library.management.entity.Fine;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object (DTO) for returning Library Fine records.
+ */
 public record FineResponse(
         Long id,
         Long issueId,
@@ -16,6 +19,9 @@ public record FineResponse(
         LocalDateTime paidAt,
         LocalDateTime createdAt
 ) {
+    /**
+     * Factory method: Maps Fine entity to FineResponse DTO.
+     */
     public static FineResponse from(Fine f) {
         return new FineResponse(
                 f.getId(),

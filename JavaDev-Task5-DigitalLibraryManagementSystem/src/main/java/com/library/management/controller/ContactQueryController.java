@@ -12,6 +12,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST Controller for Support / Contact Inquiries.
+ * Endpoints:
+ * - POST /api/queries            : Submit a new inquiry (Public or Member)
+ * - GET  /api/queries/my         : Member views own submitted inquiries
+ * - GET  /api/queries            : Admin views all inquiries
+ * - POST /api/queries/{id}/resolve: Admin marks inquiry as resolved
+ */
 @RestController
 @RequestMapping("/api/queries")
 public class ContactQueryController {
@@ -19,12 +27,16 @@ public class ContactQueryController {
     private final ContactQueryService queryService;
     private final UserRepository userRepository;
 
+    // Constructor injection for service and repository
     public ContactQueryController(ContactQueryService queryService, UserRepository userRepository) {
         this.queryService   = queryService;
         this.userRepository = userRepository;
     }
 
-    /** Anyone (even anonymous) can submit a query */
+    /**
+     * Submit inquiry endpoint.
+     * Open to anyone (including anonymous visitors).
+     */
     @PostMapping
     public ResponseEntity<ContactQueryResponse> submit(
             @Valid @RequestBody ContactQueryRequest req,
@@ -32,10 +44,13 @@ public class ContactQueryController {
         Long userId = principal != null
                 ? userRepository.findByEmail(principal.getUsername()).map(User::getId).orElse(null)
                 : null;
-        return ResponseEntity.status(HttpStatus.CREATED).body(queryService.submit(req, userId));
+        ContactQueryResponse response = queryService.submit(req, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /** Authenticated user: own queries */
+    /**
+     * Member view: List own submitted support queries.
+     */
     @GetMapping("/my")
     public ResponseEntity<Page<ContactQueryResponse>> mine(
             @AuthenticationPrincipal UserDetails principal,
@@ -46,7 +61,9 @@ public class ContactQueryController {
                 PageRequest.of(page, size, Sort.by("createdAt").descending())));
     }
 
-    /** Admin: all queries */
+    /**
+     * Admin view: List all submitted support tickets across the library.
+     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<ContactQueryResponse>> all(
@@ -56,7 +73,9 @@ public class ContactQueryController {
                 PageRequest.of(page, size, Sort.by("createdAt").descending())));
     }
 
-    /** Admin: resolve a query */
+    /**
+     * Admin action: Mark an inquiry as resolved.
+     */
     @PostMapping("/{id}/resolve")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ContactQueryResponse> resolve(@PathVariable Long id) {

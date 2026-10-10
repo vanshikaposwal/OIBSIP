@@ -3,42 +3,56 @@ package com.library.management.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * JPA Entity representing a User (Admin or Member).
+ * Maps to the 'users' table in MySQL.
+ */
 @Entity
 @Table(name = "users")
 public class User {
 
+    // Primary Key (Auto-Increment)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Full Name of the user (e.g. Alice Sharma)
     @Column(nullable = false, length = 120)
     private String name;
 
+    // Unique email address used for login
     @Column(nullable = false, unique = true, length = 180)
     private String email;
 
+    // BCrypt-hashed password (never plain text)
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
+    // User Role (ROLE_USER or ROLE_ADMIN)
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Role role = Role.ROLE_USER;
 
+    // Contact phone number
     @Column(length = 20)
     private String phone;
 
+    // Address
     @Column(columnDefinition = "TEXT")
     private String address;
 
+    // Account active flag (true = active, false = disabled)
     @Column(nullable = false)
     private boolean enabled = true;
 
+    // Timestamps
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    // Default no-argument constructor required by JPA
     public User() {}
 
     public User(Long id, String name, String email, String passwordHash, Role role, String phone, String address, boolean enabled, LocalDateTime createdAt, LocalDateTime updatedAt) {

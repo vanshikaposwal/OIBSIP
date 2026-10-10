@@ -12,6 +12,15 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST Controller for Book Issues (Circulation).
+ * Endpoints:
+ * - POST /api/issues/book/{bookId}                   : Member self-issues a book
+ * - POST /api/issues/admin/book/{bookId}/user/{userId}: Admin issues on behalf of member
+ * - POST /api/issues/{issueId}/return                 : Returns a borrowed book
+ * - GET  /api/issues/my                               : Member views own issue history
+ * - GET  /api/issues                                  : Admin views all issues
+ */
 @RestController
 @RequestMapping("/api/issues")
 public class BookIssueController {
@@ -19,30 +28,42 @@ public class BookIssueController {
     private final BookIssueService issueService;
     private final UserRepository userRepository;
 
+    // Constructor injection for services and repositories
     public BookIssueController(BookIssueService issueService, UserRepository userRepository) {
         this.issueService   = issueService;
         this.userRepository = userRepository;
     }
 
-    /** User: issue a book to self */
+    /**
+     * Member self-issue endpoint.
+     * Takes the book ID from URL path and the logged-in user from the session.
+     */
     @PostMapping("/book/{bookId}")
     public ResponseEntity<BookIssueResponse> issue(
             @PathVariable Long bookId,
             @AuthenticationPrincipal UserDetails principal) {
         Long userId = resolveUserId(principal);
-        return ResponseEntity.status(HttpStatus.CREATED).body(issueService.issue(userId, bookId));
+        BookIssueResponse response = issueService.issue(userId, bookId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /** Admin: issue on behalf of any user */
+    /**
+     * Admin issue-on-behalf endpoint.
+     * Allows librarian to issue a book directly to any member ID.
+     */
     @PostMapping("/admin/book/{bookId}/user/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookIssueResponse> issueForUser(
             @PathVariable Long bookId,
             @PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(issueService.issue(userId, bookId));
+        BookIssueResponse response = issueService.issue(userId, bookId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /** User or admin: return */
+    /**
+     * Return book endpoint.
+     * Accessible by the member who borrowed it, or by an administrator.
+     */
     @PostMapping("/{issueId}/return")
     public ResponseEntity<BookIssueResponse> returnBook(
             @PathVariable Long issueId,
@@ -51,12 +72,17 @@ public class BookIssueController {
         Long requestingId = resolveUserId(principal);
         boolean isAdmin = principal.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        if (!isAdmin && !bi.userId().equals(requestingId))
+
+        // Non-admins can only return books they borrowed themselves
+        if (!isAdmin && !bi.userId().equals(requestingId)) {
             throw new BusinessException("Access denied", 403);
+        }
         return ResponseEntity.ok(issueService.returnBook(issueId));
     }
 
-    /** User: own issues */
+    /**
+     * Member view: List current user's borrowed books and history.
+     */
     @GetMapping("/my")
     public ResponseEntity<Page<BookIssueResponse>> myIssues(
             @AuthenticationPrincipal UserDetails principal,
@@ -67,7 +93,9 @@ public class BookIssueController {
                 Sort.by("createdAt").descending())));
     }
 
-    /** Admin: all issues */
+    /**
+     * Admin view: List all book issue records across the entire library.
+     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<BookIssueResponse>> all(
@@ -77,6 +105,9 @@ public class BookIssueController {
                 Sort.by("createdAt").descending())));
     }
 
+    /**
+     * Helper method: Resolves internal numeric user ID from Spring Security's UserDetails.
+     */
     private Long resolveUserId(UserDetails principal) {
         return userRepository.findByEmail(principal.getUsername())
                 .map(User::getId).orElseThrow();

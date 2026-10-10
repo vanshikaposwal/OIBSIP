@@ -11,6 +11,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST Controller for Fines management.
+ * Endpoints:
+ * - GET  /api/fines/my      : Member views their own fines
+ * - GET  /api/fines         : Admin views all fines across the library
+ * - POST /api/fines/{id}/pay: Member pays / clears their fine
+ */
 @RestController
 @RequestMapping("/api/fines")
 public class FineController {
@@ -18,11 +25,15 @@ public class FineController {
     private final FineService fineService;
     private final UserRepository userRepository;
 
+    // Constructor injection for service and repository
     public FineController(FineService fineService, UserRepository userRepository) {
         this.fineService    = fineService;
         this.userRepository = userRepository;
     }
 
+    /**
+     * Member view: List current user's fines.
+     */
     @GetMapping("/my")
     public ResponseEntity<Page<FineResponse>> myFines(
             @AuthenticationPrincipal UserDetails principal,
@@ -33,6 +44,9 @@ public class FineController {
                 PageRequest.of(page, size, Sort.by("createdAt").descending())));
     }
 
+    /**
+     * Admin view: List all library fines.
+     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<FineResponse>> all(
@@ -42,6 +56,9 @@ public class FineController {
                 PageRequest.of(page, size, Sort.by("createdAt").descending())));
     }
 
+    /**
+     * Pay fine endpoint: Clears outstanding fine.
+     */
     @PostMapping("/{id}/pay")
     public ResponseEntity<FineResponse> pay(
             @PathVariable Long id,
@@ -52,6 +69,9 @@ public class FineController {
         return ResponseEntity.ok(fineService.pay(id, userId, isAdmin));
     }
 
+    /**
+     * Helper method: Resolves numeric user ID from UserDetails.
+     */
     private Long resolveId(UserDetails principal) {
         return userRepository.findByEmail(principal.getUsername()).map(User::getId).orElseThrow();
     }

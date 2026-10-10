@@ -4,37 +4,49 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * JPA Entity representing a Fine levied for an overdue book.
+ * Maps to the 'fines' table in MySQL.
+ */
 @Entity
 @Table(name = "fines")
 public class Fine {
 
+    // Primary Key (Auto-Increment)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 1:1 relationship with the BookIssue that caused this fine
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "issue_id", nullable = false, unique = true)
     private BookIssue issue;
 
+    // User who owes this fine
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // Total monetary amount (e.g. ₹20.00)
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
+    // Payment status flag (false = unpaid, true = paid)
     @Column(nullable = false)
     private boolean paid = false;
 
+    // Timestamp when the fine was settled
     @Column(name = "paid_at")
     private LocalDateTime paidAt;
 
+    // Timestamps
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    // Default no-argument constructor required by JPA
     public Fine() {}
 
     public Fine(Long id, BookIssue issue, User user, BigDecimal amount, boolean paid, LocalDateTime paidAt, LocalDateTime createdAt, LocalDateTime updatedAt) {

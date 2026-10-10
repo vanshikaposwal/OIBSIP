@@ -11,11 +11,16 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Spring Data JPA Repository for Reservations (Waitlists).
+ */
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
+    // Checks if a member already has an active reservation for this book
     boolean existsByUserIdAndBookIdAndStatus(Long userId, Long bookId, ReservationStatus status);
 
+    // Finds the oldest active reservation in the queue for a given book (FIFO queue)
     @Query("""
         SELECT r FROM Reservation r
         WHERE r.book.id = :bookId AND r.status = 'ACTIVE'
@@ -23,11 +28,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         """)
     Optional<Reservation> findOldestActiveForBook(@Param("bookId") Long bookId);
 
+    // Finds reservations by user ID
     Page<Reservation> findByUserId(Long userId, Pageable pageable);
 
+    // Master query loading all reservations with user and book entities (avoids N+1)
     @Query("SELECT r FROM Reservation r JOIN FETCH r.user JOIN FETCH r.book")
     Page<Reservation> findAllFetchAll(Pageable pageable);
 
+    // User query loading reservations with book entities (avoids N+1)
     @Query("SELECT r FROM Reservation r JOIN FETCH r.user JOIN FETCH r.book WHERE r.user.id = :userId")
     Page<Reservation> findByUserIdFetchAll(@Param("userId") Long userId, Pageable pageable);
 }

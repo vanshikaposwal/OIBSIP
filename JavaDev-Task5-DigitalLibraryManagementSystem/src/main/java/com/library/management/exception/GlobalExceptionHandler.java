@@ -15,26 +15,53 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Global error handler — returns consistent JSON error body, never exposes stack traces.
+ * Global Exception Handler for the entire application.
+ * 
+ * In Spring Boot, @RestControllerAdvice intercepts exceptions thrown by any @RestController.
+ * It formats the error into a clean, predictable JSON response object instead of leaking
+ * ugly Java stack traces to the user/client.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    record ErrorBody(LocalDateTime timestamp, int status, String error, String message, String path,
-                     List<Map<String, String>> fieldErrors) {}
+    /**
+     * DTO representing the error payload returned to the API client.
+     */
+    public record ErrorBody(
+            LocalDateTime timestamp,
+            int status,
+            String error,
+            String message,
+            String path,
+            List<Map<String, String>> fieldErrors
+    ) {}
 
+    /**
+     * Catches ResourceNotFoundException when an entity (User, Book, Issue, etc.) is not found.
+     * Returns HTTP 404 NOT FOUND.
+     */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorBody> handleNotFound(ResourceNotFoundException ex, HttpServletRequest req) {
         return build(HttpStatus.NOT_FOUND, ex.getMessage(), req, null);
     }
 
+    /**
+     * Catches BusinessException when business rules are violated (e.g. duplicate ISBN, unpaid fines).
+     * Returns HTTP 409 CONFLICT or HTTP 422 UNPROCESSABLE_ENTITY.
+     */
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorBody> handleBusiness(BusinessException ex, HttpServletRequest req) {
         HttpStatus status = HttpStatus.resolve(ex.getStatusCode());
-        if (status == null) status = HttpStatus.CONFLICT;
+        if (status == null) {
+            status = HttpStatus.CONFLICT;
+        }
         return build(status, ex.getMessage(), req, null);
     }
 
+    /**
+     * Catches Bean Validation errors triggered by @Valid annotations (e.g., blank title, invalid email).
+     * Returns HTTP 400 BAD REQUEST along with a list of field error messages.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorBody> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest req) {
         List<Map<String, String>> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
@@ -43,19 +70,30 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "Validation failed", req, fieldErrors);
     }
 
+    /**
+     * Catches AccessDeniedException when a user attempts an action outside their role permissions.
+     * Returns HTTP 403 FORBIDDEN.
+     */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorBody> handleAccessDenied(AccessDeniedException ex, HttpServletRequest req) {
         return build(HttpStatus.FORBIDDEN, "Access denied", req, null);
     }
 
+    /**
+     * Catches AuthenticationException when a user provides bad credentials.
+     * Returns HTTP 401 UNAUTHORIZED.
+     */
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorBody> handleAuth(AuthenticationException ex, HttpServletRequest req) {
         return build(HttpStatus.UNAUTHORIZED, "Unauthorized", req, null);
     }
 
+    /**
+     * Fallback handler for any uncaught system exceptions.
+     * Returns HTTP 500 INTERNAL SERVER ERROR with a generic message so internal details aren't leaked.
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorBody> handleGeneric(Exception ex, HttpServletRequest req) {
-        // Log but never expose stack trace to client
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred", req, null);
     }
 

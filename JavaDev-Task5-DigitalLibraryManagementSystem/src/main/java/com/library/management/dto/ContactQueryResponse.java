@@ -4,6 +4,9 @@ import com.library.management.entity.ContactQuery;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object (DTO) for returning Contact / Support Inquiry records.
+ */
 public record ContactQueryResponse(
         Long id,
         Long userId,
@@ -14,6 +17,9 @@ public record ContactQueryResponse(
         String status,
         LocalDateTime createdAt
 ) {
+    /**
+     * Factory method: Maps ContactQuery entity to ContactQueryResponse DTO.
+     */
     public static ContactQueryResponse from(ContactQuery cq) {
         return new ContactQueryResponse(
                 cq.getId(),

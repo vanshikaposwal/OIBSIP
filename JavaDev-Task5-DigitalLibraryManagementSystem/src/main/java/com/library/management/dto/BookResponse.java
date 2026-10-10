@@ -4,6 +4,11 @@ import com.library.management.entity.Book;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object (DTO) for returning Book details to the client.
+ * 
+ * Provides an immutable snapshot of a book without exposing internal entity mechanics.
+ */
 public record BookResponse(
         Long id,
         String title,
@@ -17,6 +22,9 @@ public record BookResponse(
         int availableQuantity,
         LocalDateTime createdAt
 ) {
+    /**
+     * Factory method: Converts a Book entity into a BookResponse DTO.
+     */
     public static BookResponse from(Book b) {
         return new BookResponse(
                 b.getId(), b.getTitle(), b.getAuthor(), b.getIsbn(),

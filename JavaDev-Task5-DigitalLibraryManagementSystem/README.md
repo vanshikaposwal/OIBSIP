@@ -183,3 +183,57 @@ Tests run against an in-memory **H2 (MySQL mode)** database with Flyway disabled
 - `GET /api/queries/my` — Current user's submitted queries
 - `GET /api/queries` — *(Admin)* All support tickets
 - `POST /api/queries/{id}/resolve` — *(Admin)* Mark ticket as resolved
+
+---
+
+## 📖 Beginner's Guide: Understanding the Project Architecture
+
+This project is organized according to standard **Spring Boot Layered Architecture**, which makes the code easy to read, test, and maintain:
+
+```
+[ Frontend (HTML / CSS / JavaScript) ]
+              │ (HTTP JSON Requests)
+              ▼
+[ Controllers ]  (@RestController)
+    - Receives HTTP requests, validates input (@Valid), and returns JSON responses (ResponseEntity).
+              │
+              ▼
+[ Services ]     (@Service)
+    - Contains business logic, circulation rules, fine calculations, and database transaction boundaries (@Transactional).
+              │
+              ▼
+[ Repositories ] (@Repository)
+    - Interfaces extending JpaRepository that communicate with MySQL using Spring Data JPA.
+              │
+              ▼
+[ Entities & Database ] (@Entity / MySQL)
+    - Java classes mapped to database tables ('books', 'users', 'book_issues', 'fines', 'reservations', 'contact_queries').
+```
+
+### Key Spring Boot Concepts Used:
+1. **Dependency Injection**: Spring automatically injects dependencies (repositories into services, services into controllers) via constructors.
+2. **DTOs (Data Transfer Objects)**: Records like `BookRequest` and `BookResponse` are used instead of exposing raw Database entities directly to clients.
+3. **Validation**: Annotations like `@NotBlank`, `@Size`, `@Min`, and `@Email` validate user input automatically before reaching business logic.
+4. **Global Exception Handling**: `@RestControllerAdvice` catches exceptions (`ResourceNotFoundException`, `BusinessException`, etc.) and returns uniform JSON error messages without exposing Java stack traces.
+5. **Spring Security**: Manages session-based authentication, BCrypt password hashing, and role checks (`ROLE_ADMIN`, `ROLE_USER`).
+
+---
+
+## 🎓 Viva / Interview Q&A Guide (OIBSIP Task 5)
+
+If you are presenting this project for an internship evaluation, viva, or interview, here are common questions evaluators ask:
+
+**Q1: How do you prevent two users from borrowing the same last remaining book copy?**
+> **Answer**: In `BookIssueService`, the `issue()` method is marked `@Transactional`. When a book is retrieved, we verify that `availableQuantity > 0`. If valid, `availableQuantity` is immediately decremented by 1 within the same transaction. If stock is 0, a `BusinessException` is thrown.
+
+**Q2: How are overdue book fines calculated?**
+> **Answer**: In `BookIssueService.returnBook()`, we compare today's date (`LocalDate.now()`) with the issue's `dueDate`. If `today.isAfter(dueDate)`, we compute overdue days using `ChronoUnit.DAYS.between(dueDate, today)`. The fine is calculated as `overdueDays * fineRate` (default ₹5/day) and saved in the `fines` table linked 1:1 to the issue record.
+
+**Q3: How is password security implemented?**
+> **Answer**: Passwords are never stored in plain text. We configure `BCryptPasswordEncoder` in `SecurityConfig`. During user registration, the password is encrypted using BCrypt (salt + hash) before being saved to the database.
+
+**Q4: How does the reservation waitlist work?**
+> **Answer**: When a book's `availableQuantity` is 0, members can place a reservation. When another member returns a copy in `returnBook()`, the system looks for the oldest active reservation (`ORDER BY reservationDate ASC`) and marks it as `FULFILLED`.
+
+**Q5: What is the purpose of DTOs?**
+> **Answer**: DTOs separate the database model from the API layer. For example, `UserResponse` excludes sensitive fields like `passwordHash`, ensuring passwords are never exposed over the network.

@@ -4,6 +4,9 @@ import com.library.management.entity.Reservation;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object (DTO) for returning Book Reservation (Waitlist) records.
+ */
 public record ReservationResponse(
         Long id,
         Long userId,
@@ -15,6 +18,9 @@ public record ReservationResponse(
         LocalDateTime fulfilledAt,
         LocalDateTime createdAt
 ) {
+    /**
+     * Factory method: Maps Reservation entity to ReservationResponse DTO.
+     */
     public static ReservationResponse from(Reservation r) {
         return new ReservationResponse(
                 r.getId(),

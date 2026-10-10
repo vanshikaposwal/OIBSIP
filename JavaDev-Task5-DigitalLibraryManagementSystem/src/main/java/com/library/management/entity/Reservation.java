@@ -3,38 +3,50 @@ package com.library.management.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * JPA Entity representing a Book Reservation (Waitlist entry).
+ * Maps to the 'reservations' table in MySQL.
+ */
 @Entity
 @Table(name = "reservations")
 public class Reservation {
 
+    // Primary Key (Auto-Increment)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Member who placed the reservation
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // Book that is reserved
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
+    // Status: ACTIVE, FULFILLED, or CANCELLED
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 12)
     private ReservationStatus status = ReservationStatus.ACTIVE;
 
+    // Timestamp when the reservation was placed
     @Column(name = "reservation_date", nullable = false)
     private LocalDateTime reservationDate;
 
+    // Timestamp when a returned copy fulfilled this reservation
     @Column(name = "fulfilled_at")
     private LocalDateTime fulfilledAt;
 
+    // Timestamps
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    // Default no-argument constructor required by JPA
     public Reservation() {}
 
     public Reservation(Long id, User user, Book book, ReservationStatus status, LocalDateTime reservationDate, LocalDateTime fulfilledAt, LocalDateTime createdAt, LocalDateTime updatedAt) {

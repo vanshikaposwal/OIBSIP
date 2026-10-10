@@ -3,40 +3,53 @@ package com.library.management.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * JPA Entity representing a Contact / Support Ticket query.
+ * Maps to the 'contact_queries' table in MySQL.
+ */
 @Entity
 @Table(name = "contact_queries")
 public class ContactQuery {
 
+    // Primary Key (Auto-Increment)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Optional relationship to registered User (can be null for anonymous visitors)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
+    // Name of sender
     @Column(nullable = false, length = 120)
     private String name;
 
+    // Email address of sender
     @Column(nullable = false, length = 180)
     private String email;
 
+    // Subject of inquiry
     @Column(nullable = false, length = 300)
     private String subject;
 
+    // Detailed message body
     @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
 
+    // Status: OPEN or RESOLVED
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private QueryStatus status = QueryStatus.OPEN;
 
+    // Timestamps
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    // Default no-argument constructor required by JPA
     public ContactQuery() {}
 
     public ContactQuery(Long id, User user, String name, String email, String subject, String message, QueryStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {

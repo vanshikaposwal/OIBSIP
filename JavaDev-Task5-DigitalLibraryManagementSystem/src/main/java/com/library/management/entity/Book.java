@@ -3,47 +3,63 @@ package com.library.management.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * JPA Entity representing a Book in the library catalog.
+ * Maps to the 'books' table in MySQL.
+ */
 @Entity
 @Table(name = "books")
 public class Book {
 
+    // Primary Key (Auto-Increment)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Title of the book (Max 300 characters, mandatory)
     @Column(nullable = false, length = 300)
     private String title;
 
+    // Author name (Max 200 characters, mandatory)
     @Column(nullable = false, length = 200)
     private String author;
 
+    // International Standard Book Number (Unique identifier, mandatory)
     @Column(nullable = false, unique = true, length = 20)
     private String isbn;
 
+    // Category / Subject genre (e.g. Java, Database, Science, etc.)
     @Column(nullable = false, length = 80)
     private String category;
 
+    // Publishing company name
     @Column(length = 200)
     private String publisher;
 
+    // Year published (e.g. 2021)
     @Column(name = "publish_year")
     private Short publishYear;
 
+    // Summary / Synopsis
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    // Total copies owned by the library
     @Column(name = "total_quantity", nullable = false)
     private int totalQuantity = 1;
 
+    // Currently available copies on the shelf (not issued)
     @Column(name = "available_quantity", nullable = false)
     private int availableQuantity = 1;
 
+    // Timestamps
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    // Default no-argument constructor required by JPA
     public Book() {}
 
     public Book(Long id, String title, String author, String isbn, String category, String publisher, Short publishYear, String description, int totalQuantity, int availableQuantity, LocalDateTime createdAt, LocalDateTime updatedAt) {

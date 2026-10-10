@@ -13,9 +13,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * Seeds the database with an admin account, sample users, and 12+ books.
- * Runs only once — guards against re-seeding by checking if admin already exists.
- * Passwords are hashed via BCrypt here at runtime; no plain text is ever stored.
+ * Database Seeder Component.
+ * 
+ * Implements CommandLineRunner so that Spring Boot executes the run() method
+ * automatically once the application context is started.
+ * 
+ * Functions:
+ * 1. Checks if the admin account already exists to prevent duplicate seeding.
+ * 2. Seeds initial sample users with BCrypt-hashed passwords.
+ * 3. Seeds 12 sample books across diverse categories.
+ * 4. Annotated with @Profile("!test") so automated test runs use their own clean data.
  */
 @Component
 @Profile("!test")
@@ -27,6 +34,7 @@ public class DataSeeder implements CommandLineRunner {
     private final BookRepository bookRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // Constructor injection for repositories and password encoder
     public DataSeeder(UserRepository userRepository,
                       BookRepository bookRepository,
                       PasswordEncoder passwordEncoder) {
@@ -38,14 +46,17 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
+        // Step 1: Check if admin account is already present in the database
         if (userRepository.existsByEmail("admin@library.com")) {
             log.info("Seed data already present — skipping.");
             return;
         }
-        log.info("Seeding database…");
+
+        // Step 2: Seed sample users and books
+        log.info("Seeding database with default accounts and books...");
         seedUsers();
         seedBooks();
-        log.info("Seeding complete.");
+        log.info("Database seeding complete.");
     }
 
     private void seedUsers() {

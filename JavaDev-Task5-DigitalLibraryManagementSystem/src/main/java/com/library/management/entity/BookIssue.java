@@ -4,41 +4,54 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * JPA Entity representing a Book Issue (Loan / Circulation record).
+ * Maps to the 'book_issues' table in MySQL.
+ */
 @Entity
 @Table(name = "book_issues")
 public class BookIssue {
 
+    // Primary Key (Auto-Increment)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Many book issues belong to one User (Borrower)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // Many book issues belong to one Book
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
+    // Date the book was borrowed
     @Column(name = "issue_date", nullable = false)
     private LocalDate issueDate;
 
+    // Date the book is expected to be returned (default: issueDate + 14 days)
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
+    // Actual date the book was returned (null if currently borrowed)
     @Column(name = "return_date")
     private LocalDate returnDate;
 
+    // Circulation status: ISSUED or RETURNED
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     private IssueStatus status = IssueStatus.ISSUED;
 
+    // Timestamps
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    // Default no-argument constructor required by JPA
     public BookIssue() {}
 
     public BookIssue(Long id, User user, Book book, LocalDate issueDate, LocalDate dueDate, LocalDate returnDate, IssueStatus status, LocalDateTime createdAt, LocalDateTime updatedAt) {
