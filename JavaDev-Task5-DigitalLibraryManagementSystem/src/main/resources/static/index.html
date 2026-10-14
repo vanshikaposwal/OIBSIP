@@ -269,17 +269,25 @@
       }
     });
 
-    // Check auth status for navbar
-    getCurrentUser().then(user => {
-      const slot = document.getElementById('nav-auth-slot');
-      if (user && slot) {
-        slot.innerHTML = `
-          <a href="/dashboard.html" class="btn btn-primary btn-sm">
-            <i class="bi bi-grid-fill"></i> ${user.role === 'ROLE_ADMIN' ? 'Admin Dashboard' : 'My Dashboard'}
-          </a>
-        `;
+    async function init() {
+      // Check auth status for navbar and await
+      try {
+        const user = await getCurrentUser();
+        const slot = document.getElementById('nav-auth-slot');
+        if (user && slot) {
+          slot.innerHTML = `
+            <a href="/dashboard.html" class="btn btn-primary btn-sm">
+              <i class="bi bi-grid-fill"></i> ${user.role === 'ROLE_ADMIN' ? 'Admin Dashboard' : 'My Dashboard'}
+            </a>
+          `;
+        }
+      } catch (err) {
+        // Guest user - maintain default public Sign In / Join Library buttons
       }
-    });
+
+      // Load and await featured books
+      await loadFeaturedBooks();
+    }
 
     // Load featured books
     async function loadFeaturedBooks() {
@@ -319,7 +327,7 @@
       }
     }
 
-    loadFeaturedBooks();
+    document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
 </html>

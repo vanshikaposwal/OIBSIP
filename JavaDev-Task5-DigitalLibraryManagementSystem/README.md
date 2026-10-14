@@ -1,48 +1,87 @@
-# Digital Library Management System (LibSphere)
+<div align="center">
 
-A modern, full-stack **Digital Library Management System** engineered with **Spring Boot 3.x**, **Spring Data JPA**, **Spring Security**, **Flyway**, and a responsive **HTML5 / CSS3 / Vanilla JavaScript** frontend.
+# 📚 LibSphere — Digital Library Management System
 
-Built for **OIBSIP Java Developer — Task 5**.
+### OIBSIP Java Developer Internship · Task 5
 
----
+[![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.3.4-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Flyway](https://img.shields.io/badge/Flyway-Migration-CC0200?style=for-the-badge&logo=flyway&logoColor=white)](https://flywaydb.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-7C3AED?style=for-the-badge)](LICENSE)
 
-## 🌟 Key Features
+A **full-stack digital library management system** built with Spring Boot, Spring Security (session-based), Spring Data JPA, Flyway migrations, and a vanilla HTML/CSS/JS frontend. It supports complete book catalog management, member borrowing workflows, automated fine calculation, reservation waitlists, and a role-separated admin panel.
 
-### 📚 Catalog & Inventory
-- **Real-Time Stock Tracking**: Atomically tracked `total_quantity` and `available_quantity` on books to eliminate race conditions and negative inventory.
-- **Instant Search & Multi-Criteria Filtering**: Search by title, author, or ISBN; filter by subject category (Java, Programming, Database, Web Development, Computer Science, Fiction, Science, History); sort by publication year or stock level.
-- **Dynamic CSS/SVG Book Covers**: Generated on the client using palette-matched gradients and title initials — zero external image dependencies.
+[Features](#-features) · [Screenshots](#-screenshots) · [Tech Stack](#-tech-stack) · [Quick Start](#-quick-start) · [API Reference](#-rest-api-reference) · [Architecture](#-architecture)
 
-### 🔄 Lending & Circulation Rules (Single Source of Truth)
-- **14-Day Loan Period**: Configurable via `library.loan-days`.
-- **Automatic Due Dates**: Calculated upon issue (`issueDate + loanDays`).
-- **Pessimistic Locking / Atomic Decrement**: Prevents over-issuing when multiple users borrow simultaneously.
-- **Borrowing Limit**: Up to 5 active loans per member (`library.max-active-issues`).
-- **Duplicate Loan Prevention**: Users cannot borrow the same book while an active issue exists.
-- **Overdue Fine Engine**: Overdue status is derived deterministically (`dueDate < today`). Fines accrue at ₹5/day (`library.fine-per-day`) upon return, uniquely tied 1:1 to the issue record.
-- **Unpaid Fines Block**: Users with outstanding fines are prevented from borrowing new volumes (`library.block-on-unpaid-fines`).
-- **Smart Waitlist Reservations**: Users can reserve books when stock reaches 0. Returning a copy automatically fulfills the oldest active reservation in the queue.
-
-### 🛡️ Security & Access Control
-- **Session-Based Authentication**: Secure `HttpSession` with BCrypt password hashing.
-- **Role-Based Access Control**:
-  - `ROLE_ADMIN`: Master book inventory CRUD, issue-on-behalf, user management, fine receipts, support inquiry resolution.
-  - `ROLE_USER`: Self-issuing, returning, reservation waitlisting, fine payments, inquiry submissions.
-- **CSRF Protection**: Single Page Application (SPA)-compatible `CookieCsrfTokenRepository` (`XSRF-TOKEN` cookie, `X-XSRF-TOKEN` header attached via `apiFetch`).
-- **No Leaked Stack Traces**: Global `@RestControllerAdvice` formats errors into `{timestamp, status, error, message, path, fieldErrors}`.
+</div>
 
 ---
 
-## 🎨 UI Design Tokens
+## ✨ Features
 
-- **Palette**:
-  - Navy `#0F172A` (Sidebar & Primary text)
-  - Indigo `#4F46E5` & Violet `#7C3AED` (Buttons & Accents)
-  - Slate Background `#F8FAFC` & White Card `#FFFFFF`
-  - Success `#16A34A`, Warning `#D97706`, Danger `#DC2626`
-- **Typography**: Inter (Google Fonts) with system-ui fallback.
-- **Components**: Shared toasts, confirmation dialogs, status badges, skeleton loaders, button spinners, and responsive drawer sidebar.
-- **Responsive**: Fully responsive down to 360px viewports with mobile drawer overlay and horizontally scrollable tables.
+### 👤 Member Portal
+- 🔐 **Secure Authentication** — Session-based login/logout with BCrypt password hashing
+- 📖 **Book Catalog Browsing** — Search, filter by category, paginated results
+- 📦 **Self-Checkout** — Borrow books directly (max 5 active loans, 14-day term)
+- 📋 **Reservation Waitlist** — Join queue when a book is out of stock; auto-fulfilled on return
+- 💸 **Fine Tracking** — View overdue fines (₹5/day), one-click payment clearance
+- 📨 **Support Queries** — Submit contact inquiries and track ticket status
+
+### 🛡️ Admin Panel
+- 📚 **Catalog Management** — Add, edit, delete books with quantity control
+- 🔄 **Circulation Control** — Issue books on behalf of members, process returns
+- 👥 **User Management** — View member accounts, assign roles, manage access
+- 💰 **Fines Ledger** — Review all outstanding & paid fines across the library
+- 🎫 **Support Tickets** — View and resolve member-submitted queries
+
+### ⚙️ System Rules
+| Rule | Value |
+|---|---|
+| Loan Duration | 14 days |
+| Max Active Loans per Member | 5 books |
+| Overdue Fine Rate | ₹5 / day |
+| Block on Unpaid Fines | Yes (configurable) |
+| Reservation Trigger | Only when `availableQuantity = 0` |
+| Waitlist Fulfillment | Oldest reservation first (FIFO) |
+
+---
+
+## 📸 Screenshots
+
+### 🏠 Home — Landing Page
+![Home Page](docs/screenshots/home.jpg)
+*Hero section with global search, live library stats, and feature highlights.*
+
+---
+
+### 🔑 Login Page
+![Login Page](docs/screenshots/login.jpg)
+*Clean sign-in form with quick demo login buttons for Admin and Member accounts.*
+
+---
+
+### 📊 Admin Dashboard
+![Admin Dashboard](docs/screenshots/admin_dashboard.jpg)
+*Real-time metrics: total books, active loans, outstanding fines, open tickets, and recent circulation activity.*
+
+---
+
+### 📚 Browse Catalog
+![Browse Catalog](docs/screenshots/browse_catalog.jpg)
+*Paginated book grid with search, category filter, availability badges, and one-click issue/waitlist actions.*
+
+---
+
+### 📖 My Books (Member)
+![My Books](docs/screenshots/my_books.jpg)
+*Member loan tracker with due-date countdowns, status badges (Active / Due Soon / Overdue), and return actions.*
+
+---
+
+### 🗂️ Manage Books (Admin)
+![Admin Books](docs/screenshots/admin_books.jpg)
+*Full inventory table with Add/Edit modal, quantity tracking, and delete controls.*
 
 ---
 
@@ -50,190 +89,289 @@ Built for **OIBSIP Java Developer — Task 5**.
 
 | Layer | Technology |
 |---|---|
-| **Language** | Java 21+ (Compatible up to Java 25) |
+| **Language** | Java 21 |
 | **Framework** | Spring Boot 3.3.4 |
-| **Persistence** | Spring Data JPA / Hibernate 6.x |
-| **Database** | MySQL 8.x (Flyway schema migrations) |
-| **Testing DB** | H2 Database (`MODE=MySQL`) |
-| **Security** | Spring Security 6.x (BCrypt, Session, CSRF) |
-| **Frontend** | Vanilla JavaScript (ES6+), HTML5, CSS3, Bootstrap Icons |
-| **Build Tool** | Apache Maven 3.9+ |
+| **Security** | Spring Security (Session-based, BCrypt) |
+| **Persistence** | Spring Data JPA + Hibernate |
+| **Database** | MySQL 8.0 |
+| **Migrations** | Flyway (V1 schema + V2 seed data) |
+| **Build Tool** | Apache Maven |
+| **Frontend** | Vanilla HTML5, CSS3, JavaScript (ES6+) |
+| **UI Fonts & Icons** | Inter (Google Fonts), Bootstrap Icons |
+| **Testing** | JUnit 5, Mockito, Spring MockMvc, H2 (in-memory) |
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
-### 1. Prerequisites
-- **Java 21 or higher**
-- **Maven 3.9+**
-- **MySQL 8.0+**
+### Prerequisites
 
-### 2. Configure Environment Variables
-Create a local `.env` file from `.env.example`:
+Make sure you have the following installed:
+- **JDK 21+** → [Download](https://adoptium.net/)
+- **Apache Maven 3.9+** → [Download](https://maven.apache.org/download.cgi)
+- **MySQL 8.0+** → [Download](https://dev.mysql.com/downloads/mysql/)
+
+### 1. Clone the Repository
+
 ```bash
-cp .env.example .env
+git clone https://github.com/vanshikaposwal/JavaDev-Task5-DigitalLibraryManagementSystem.git
+cd JavaDev-Task5-DigitalLibraryManagementSystem
 ```
 
-Edit your credentials:
-```properties
-DB_URL=jdbc:mysql://localhost:3306/library_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Asia/Kolkata&allowPublicKeyRetrieval=true
-DB_USER=root
-DB_PASSWORD=your_mysql_password
-PORT=8080
+### 2. Configure the Database
+
+The application creates the database automatically (`createDatabaseIfNotExist=true`). Just ensure MySQL is running and set your credentials via environment variables **or** edit [`src/main/resources/application.yml`](src/main/resources/application.yml):
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/library_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Asia/Kolkata
+    username: root      # ← change if needed
+    password: 1234      # ← change if needed
 ```
 
-### 3. Run Flyway & Start the Application
+Or pass as environment variables at runtime:
+
+```bash
+export DB_URL=jdbc:mysql://localhost:3306/library_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=Asia/Kolkata
+export DB_USER=root
+export DB_PASSWORD=your_password
+```
+
+### 3. Build & Run
+
+```bash
+mvn clean package -DskipTests
+java -jar target/digital-library-management-0.0.1-SNAPSHOT.jar
+```
+
+Or run directly with Maven:
+
 ```bash
 mvn spring-boot:run
 ```
 
-On first startup:
-1. Flyway runs `V1__schema.sql` to construct tables and constraints.
-2. `DataSeeder` automatically provisions the admin account, sample users, and 12+ catalog books with BCrypt-hashed passwords.
+### 4. Open in Browser
+
+```
+http://localhost:8080
+```
+
+> **Flyway** will automatically create all tables and seed demo data on first startup.
 
 ---
 
 ## 👥 Demo Accounts (Pre-Seeded)
 
-| Role | Email | Password | Purpose |
+| Role | Email | Password | Access |
 |---|---|---|---|
-| **Administrator** | `admin@library.com` | `Admin@123` | Full administrative control & inventory management |
+| **Administrator** | `admin@library.com` | `Admin@123` | Full admin panel + all member features |
 | **Member** | `alice@example.com` | `Alice@123` | Standard borrower account |
 | **Member** | `bob@example.com` | `Bob@12345` | Standard borrower account |
 | **Member** | `carol@example.com` | `Carol@123` | Standard borrower account |
 | **Member** | `david@example.com` | `David@123` | Standard borrower account |
 
-*New users can also register freely via `/register.html`.*
-
----
-
-## 🧪 Running Automated Tests
-
-Run the full suite of unit and MockMvc integration tests:
-```bash
-mvn clean verify
-```
-
-Tests run against an in-memory **H2 (MySQL mode)** database with Flyway disabled (`application-test.yml`), verifying:
-- User registration and duplicate email rejection
-- Book inventory limits and quantity consistency
-- Loan rules: 14-day duration, 5-book max, duplicate loan blocks, zero-stock blocks
-- Overdue return fine computation (₹5/day) & oldest-reservation fulfillment
-- Reservation zero-stock requirement and cancellation
-- MockMvc security rules: 401 unauthenticated, 403 user-forbidden from admin endpoints, 201 admin creation
+> New users can also self-register at `/register.html`
 
 ---
 
 ## 🌐 Application Pages & Routes
 
-| URL Path | Access | Description |
+| URL | Access | Description |
 |---|---|---|
 | `/` | Public | Home landing page with hero search and featured books |
-| `/browse.html` | Public | Interactive book catalog with search, filters, details, and issue actions |
-| `/login.html` | Public | Sign-in page with quick demo login buttons |
-| `/register.html` | Public | Member registration form |
-| `/dashboard.html` | Authenticated | Dynamic dashboard (Admin metrics or Member loans) |
-| `/my-books.html` | Member | Borrowed books, due dates, countdowns, and return buttons |
+| `/browse.html` | Public | Interactive book catalog with filters and issue actions |
+| `/login.html` | Public | Sign-in page with quick demo buttons |
+| `/register.html` | Public | New member registration |
+| `/dashboard.html` | Authenticated | Admin metrics dashboard or Member loan overview |
+| `/my-books.html` | Member | Borrowed books, due dates, countdowns, return actions |
 | `/my-reservations.html` | Member | Active waitlists and cancellation |
-| `/my-fines.html` | Member | Fine ledger and one-click payment clearance |
-| `/contact.html` | Public / Member | Support inquiry submission & ticket status tracking |
-| `/admin-books.html` | Admin | Book catalog management, Add/Edit modal, stock controls |
-| `/admin-issues.html` | Admin | Master circulation ledger & issue-on-behalf dialog |
-| `/admin-users.html` | Admin | Member accounts, roles, and suspension controls |
-| `/admin-fines.html` | Admin | Fines ledger and payment receipts |
-| `/admin-queries.html` | Admin | Support tickets viewer and resolution actions |
+| `/my-fines.html` | Member | Fine ledger and one-click payment |
+| `/contact.html` | Public/Member | Support inquiry submission and ticket tracking |
+| `/admin-books.html` | Admin | Book catalog management and stock control |
+| `/admin-issues.html` | Admin | Circulation ledger and issue-on-behalf |
+| `/admin-users.html` | Admin | Member accounts and role management |
+| `/admin-fines.html` | Admin | Master fine ledger and receipts |
+| `/admin-queries.html` | Admin | Support tickets and resolution |
 
 ---
 
 ## 📡 REST API Reference
 
-### Authentication (`/api/auth`)
-- `POST /api/auth/register` — Register new member
-- `POST /api/auth/login` — JSON login with session creation
-- `GET /api/auth/me` — Current authenticated user profile
-- `POST /api/auth/logout` — Invalidate session
+All API endpoints are under `/api/`. Authenticated endpoints require an active session cookie.
 
-### Books (`/api/books`)
-- `GET /api/books` — Paginated search (params: `query`, `category`, `page`, `size`, `sortBy`, `dir`)
-- `GET /api/books/{id}` — Book details
-- `POST /api/books` — *(Admin)* Create book
-- `PUT /api/books/{id}` — *(Admin)* Update book details & quantity
-- `DELETE /api/books/{id}` — *(Admin)* Remove book
+### 🔐 Authentication `/api/auth`
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | Public | Register a new member |
+| `POST` | `/api/auth/login` | Public | JSON login, creates HTTP session |
+| `GET` | `/api/auth/me` | Authenticated | Current user profile |
+| `POST` | `/api/auth/logout` | Authenticated | Invalidate session |
 
-### Issues & Circulation (`/api/issues`)
-- `POST /api/issues/book/{bookId}` — Member self-issue
-- `POST /api/issues/admin/book/{bookId}/user/{userId}` — *(Admin)* Issue on behalf of member
-- `POST /api/issues/{id}/return` — Return book (calculates fines & fulfills waitlists)
-- `GET /api/issues/my` — Current user's issues
-- `GET /api/issues` — *(Admin)* All library loans
+### 📚 Books `/api/books`
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/books` | Public | Paginated search (`query`, `category`, `page`, `size`, `sortBy`, `dir`) |
+| `GET` | `/api/books/{id}` | Public | Book details by ID |
+| `POST` | `/api/books` | Admin | Create a new book entry |
+| `PUT` | `/api/books/{id}` | Admin | Update book details and quantity |
+| `DELETE` | `/api/books/{id}` | Admin | Remove a book from catalog |
 
-### Reservations (`/api/reservations`)
-- `POST /api/reservations/book/{bookId}` — Join waitlist (only if available = 0)
-- `POST /api/reservations/{id}/cancel` — Cancel active reservation
-- `GET /api/reservations/my` — Current user's reservations
-- `GET /api/reservations` — *(Admin)* All waitlists
+### 🔄 Issues & Circulation `/api/issues`
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/issues/book/{bookId}` | Member | Self-borrow a book |
+| `POST` | `/api/issues/admin/book/{bookId}/user/{userId}` | Admin | Issue on behalf of member |
+| `POST` | `/api/issues/{id}/return` | Member | Return book (computes fines, fulfils waitlists) |
+| `GET` | `/api/issues/my` | Member | Current user's active and past loans |
+| `GET` | `/api/issues` | Admin | All library loans |
 
-### Fines (`/api/fines`)
-- `GET /api/fines/my` — Current user's fines
-- `GET /api/fines` — *(Admin)* Master fine ledger
-- `POST /api/fines/{id}/pay` — Pay / settle fine
+### 📋 Reservations `/api/reservations`
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/reservations/book/{bookId}` | Member | Join waitlist (only when `available = 0`) |
+| `POST` | `/api/reservations/{id}/cancel` | Member | Cancel active reservation |
+| `GET` | `/api/reservations/my` | Member | Current user's reservations |
+| `GET` | `/api/reservations` | Admin | All waitlists |
 
-### Support & Inquiries (`/api/queries`)
-- `POST /api/queries` — Submit query (public or authenticated)
-- `GET /api/queries/my` — Current user's submitted queries
-- `GET /api/queries` — *(Admin)* All support tickets
-- `POST /api/queries/{id}/resolve` — *(Admin)* Mark ticket as resolved
+### 💸 Fines `/api/fines`
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/api/fines/my` | Member | Current user's fines |
+| `GET` | `/api/fines` | Admin | Master fine ledger |
+| `POST` | `/api/fines/{id}/pay` | Member | Settle a fine |
 
----
-
-## 📖 Beginner's Guide: Understanding the Project Architecture
-
-This project is organized according to standard **Spring Boot Layered Architecture**, which makes the code easy to read, test, and maintain:
-
-```
-[ Frontend (HTML / CSS / JavaScript) ]
-              │ (HTTP JSON Requests)
-              ▼
-[ Controllers ]  (@RestController)
-    - Receives HTTP requests, validates input (@Valid), and returns JSON responses (ResponseEntity).
-              │
-              ▼
-[ Services ]     (@Service)
-    - Contains business logic, circulation rules, fine calculations, and database transaction boundaries (@Transactional).
-              │
-              ▼
-[ Repositories ] (@Repository)
-    - Interfaces extending JpaRepository that communicate with MySQL using Spring Data JPA.
-              │
-              ▼
-[ Entities & Database ] (@Entity / MySQL)
-    - Java classes mapped to database tables ('books', 'users', 'book_issues', 'fines', 'reservations', 'contact_queries').
-```
-
-### Key Spring Boot Concepts Used:
-1. **Dependency Injection**: Spring automatically injects dependencies (repositories into services, services into controllers) via constructors.
-2. **DTOs (Data Transfer Objects)**: Records like `BookRequest` and `BookResponse` are used instead of exposing raw Database entities directly to clients.
-3. **Validation**: Annotations like `@NotBlank`, `@Size`, `@Min`, and `@Email` validate user input automatically before reaching business logic.
-4. **Global Exception Handling**: `@RestControllerAdvice` catches exceptions (`ResourceNotFoundException`, `BusinessException`, etc.) and returns uniform JSON error messages without exposing Java stack traces.
-5. **Spring Security**: Manages session-based authentication, BCrypt password hashing, and role checks (`ROLE_ADMIN`, `ROLE_USER`).
+### 🎫 Support Queries `/api/queries`
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/queries` | Public/Member | Submit a support query |
+| `GET` | `/api/queries/my` | Member | Current user's submitted queries |
+| `GET` | `/api/queries` | Admin | All support tickets |
+| `POST` | `/api/queries/{id}/resolve` | Admin | Mark ticket as resolved |
 
 ---
 
-## 🎓 Viva / Interview Q&A Guide (OIBSIP Task 5)
+## 🏗️ Architecture
 
-If you are presenting this project for an internship evaluation, viva, or interview, here are common questions evaluators ask:
+This project follows standard **Spring Boot Layered Architecture**:
 
-**Q1: How do you prevent two users from borrowing the same last remaining book copy?**
-> **Answer**: In `BookIssueService`, the `issue()` method is marked `@Transactional`. When a book is retrieved, we verify that `availableQuantity > 0`. If valid, `availableQuantity` is immediately decremented by 1 within the same transaction. If stock is 0, a `BusinessException` is thrown.
+```
+┌─────────────────────────────────────────┐
+│     Frontend (HTML / CSS / JS)          │
+│   Vanilla SPA-style pages + Fetch API   │
+└────────────────────┬────────────────────┘
+                     │ HTTP JSON
+┌────────────────────▼────────────────────┐
+│          Controllers (@RestController)  │
+│  Receives requests, validates input,    │
+│  returns ResponseEntity<T>             │
+└────────────────────┬────────────────────┘
+                     │
+┌────────────────────▼────────────────────┐
+│          Services (@Service)            │
+│  Business logic, fine calculations,     │
+│  loan rules, @Transactional boundaries  │
+└────────────────────┬────────────────────┘
+                     │
+┌────────────────────▼────────────────────┐
+│       Repositories (@Repository)        │
+│  JpaRepository interfaces, JPQL queries │
+└────────────────────┬────────────────────┘
+                     │
+┌────────────────────▼────────────────────┐
+│    Entities & Database (@Entity/MySQL)  │
+│  books, users, book_issues, fines,      │
+│  reservations, contact_queries          │
+└─────────────────────────────────────────┘
+```
 
-**Q2: How are overdue book fines calculated?**
-> **Answer**: In `BookIssueService.returnBook()`, we compare today's date (`LocalDate.now()`) with the issue's `dueDate`. If `today.isAfter(dueDate)`, we compute overdue days using `ChronoUnit.DAYS.between(dueDate, today)`. The fine is calculated as `overdueDays * fineRate` (default ₹5/day) and saved in the `fines` table linked 1:1 to the issue record.
+### Project Package Structure
 
-**Q3: How is password security implemented?**
-> **Answer**: Passwords are never stored in plain text. We configure `BCryptPasswordEncoder` in `SecurityConfig`. During user registration, the password is encrypted using BCrypt (salt + hash) before being saved to the database.
+```
+src/main/java/com/library/management/
+├── config/
+│   ├── SecurityConfig.java          # Spring Security config, BCrypt bean
+│   ├── CustomUserDetailsService.java # Loads user by email for auth
+│   ├── LibraryProperties.java       # Binds library.* from application.yml
+│   └── DataSeeder.java              # Provisions demo accounts on startup
+├── controller/                      # REST controllers (one per domain)
+├── service/                         # Business logic and transaction management
+├── repository/                      # Spring Data JPA interfaces
+├── entity/                          # JPA entities with builder pattern
+├── dto/                             # Request/Response record classes
+└── exception/                       # GlobalExceptionHandler, custom exceptions
+```
 
-**Q4: How does the reservation waitlist work?**
-> **Answer**: When a book's `availableQuantity` is 0, members can place a reservation. When another member returns a copy in `returnBook()`, the system looks for the oldest active reservation (`ORDER BY reservationDate ASC`) and marks it as `FULFILLED`.
+### Key Design Decisions
 
-**Q5: What is the purpose of DTOs?**
-> **Answer**: DTOs separate the database model from the API layer. For example, `UserResponse` excludes sensitive fields like `passwordHash`, ensuring passwords are never exposed over the network.
+| Concern | Approach |
+|---|---|
+| **Authentication** | Spring Security session (HttpSession) with BCrypt |
+| **Authorization** | `ROLE_ADMIN` and `ROLE_USER`, endpoint-level guards |
+| **Data Integrity** | `@Transactional` on service methods, DB unique constraints |
+| **Input Validation** | Bean Validation (`@NotBlank`, `@Email`, `@Min`, etc.) |
+| **Error Handling** | `@RestControllerAdvice` → uniform JSON error body |
+| **DB Migrations** | Flyway V1 (schema) + V2 (seed) — no manual SQL needed |
+| **Testing** | Unit tests (Mockito) + MockMvc integration tests (H2) |
+
+---
+
+## 🧪 Running Tests
+
+```bash
+mvn clean verify
+```
+
+Tests run against an in-memory **H2 (MySQL mode)** database with Flyway disabled. The suite covers:
+
+- ✅ User registration and duplicate email rejection
+- ✅ Book inventory limits and quantity consistency
+- ✅ Loan rules: 14-day duration, 5-book max, duplicate loan blocks, zero-stock blocks
+- ✅ Overdue fine computation (₹5/day) and FIFO waitlist fulfillment
+- ✅ Reservation zero-stock requirement and cancellation
+- ✅ MockMvc security: `401` unauthenticated, `403` user-forbidden on admin endpoints, `201` admin creation
+
+---
+
+## ⚙️ Configuration Reference
+
+```yaml
+# application.yml — key settings
+library:
+  loan-days: 14           # Loan duration in days
+  fine-per-day: 5         # Fine rate in ₹ per day overdue
+  max-active-issues: 5    # Max books a member can borrow at once
+  block-on-unpaid-fines: true  # Block borrowing if member has unpaid fines
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    session:
+      timeout: 30m        # Session expiry
+```
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m 'feat: add your feature'`
+4. Push to the branch: `git push origin feature/your-feature`
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+Made with ❤️ by **Vanshika Poswal** for the **Oasis Infobyte (OIBSIP)** Java Developer Internship
+
+[![GitHub](https://img.shields.io/badge/GitHub-vanshikaposwal-181717?style=for-the-badge&logo=github)](https://github.com/vanshikaposwal)
+
+</div>

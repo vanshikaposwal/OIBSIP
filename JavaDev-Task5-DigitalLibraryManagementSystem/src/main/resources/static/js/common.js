@@ -73,7 +73,12 @@ async function apiFetch(url, options = {}) {
     }
     return await response.text();
   } catch (err) {
-    if (err.status === 401 && !window.location.pathname.endsWith('login.html') && !window.location.pathname.endsWith('register.html') && !window.location.pathname.endsWith('index.html')) {
+    const publicPages = ['/', '', '/index.html', '/browse.html', '/contact.html', '/login.html', '/register.html'];
+    const currentPath = window.location.pathname;
+    const isPublicPage = publicPages.some(p => currentPath === p || currentPath.endsWith(p));
+    const isAuthProbe = url.includes('/api/auth/me') || Boolean(options.skipAuthRedirect);
+
+    if (err.status === 401 && !isAuthProbe && !isPublicPage) {
       showToast('Session expired. Please log in again.', 'warning');
       setTimeout(() => {
         window.location.href = `/login.html?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`;
@@ -94,7 +99,7 @@ async function getCurrentUser(refresh = false) {
     return currentUserCache;
   }
   try {
-    const user = await apiFetch('/api/auth/me');
+    const user = await apiFetch('/api/auth/me', { skipAuthRedirect: true });
     currentUserCache = user;
     return user;
   } catch (err) {
@@ -125,7 +130,7 @@ async function logout() {
     console.error('Logout error:', err);
   } finally {
     currentUserCache = null;
-    window.location.href = '/login.html';
+    window.location.href = '/';
   }
 }
 

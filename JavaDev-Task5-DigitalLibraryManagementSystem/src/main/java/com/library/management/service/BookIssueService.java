@@ -217,5 +217,6 @@ public class BookIssueService {
     private BookIssue getOrThrow(Long id) {
         return issueRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Issue not found: " + id));
+        
     }
 }

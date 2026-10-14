@@ -88,7 +88,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/queries").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/auth/me").permitAll()
                 // Allow public browsing of books
-                .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/books", "/api/books/**").permitAll()
                 // Require ADMIN role for admin management APIs
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // All other endpoints require authentication
